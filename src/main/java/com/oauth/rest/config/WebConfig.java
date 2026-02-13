@@ -4,7 +4,6 @@ import java.util.Arrays;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.annotation.Order;
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
@@ -15,7 +14,6 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 public class WebConfig {
 
     @Bean
-    @Order(1)
     public CorsConfigurationSource corsConfigurationSource() {
 
         CorsConfiguration configuration = new CorsConfiguration();

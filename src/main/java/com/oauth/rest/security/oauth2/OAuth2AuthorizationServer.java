@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.BeanIds;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.config.annotation.configurers.ClientDetailsServiceConfigurer;
@@ -14,14 +15,20 @@ import org.springframework.security.oauth2.config.annotation.web.configurers.Aut
 import org.springframework.security.oauth2.provider.token.TokenStore;
 import org.springframework.security.oauth2.provider.token.store.JwtAccessTokenConverter;
 import org.springframework.security.oauth2.provider.token.store.JwtTokenStore;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.oauth2.provider.token.TokenEnhancerChain;
+import java.util.Arrays;
+import org.springframework.beans.factory.annotation.Qualifier;
 
 @Configuration
 @EnableAuthorizationServer
 public class OAuth2AuthorizationServer extends AuthorizationServerConfigurerAdapter {
 
+    @Autowired
+    private CustomTokenEnhancer customTokenEnhancer;
+
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
-    private final UserDetailsService userDetailsService;
 
     @Value("${oauth2.client-id}")
     private String clientId;
@@ -43,12 +50,10 @@ public class OAuth2AuthorizationServer extends AuthorizationServerConfigurerAdap
 
     public OAuth2AuthorizationServer(
             PasswordEncoder passwordEncoder,
-            AuthenticationManager authenticationManager,
-            UserDetailsService userDetailsService) {
+            @Qualifier(BeanIds.AUTHENTICATION_MANAGER) AuthenticationManager authenticationManager) {
 
         this.passwordEncoder = passwordEncoder;
         this.authenticationManager = authenticationManager;
-        this.userDetailsService = userDetailsService;
     }
 
     @Bean
@@ -87,10 +92,15 @@ public class OAuth2AuthorizationServer extends AuthorizationServerConfigurerAdap
 
     @Override
     public void configure(AuthorizationServerEndpointsConfigurer endpoints) {
+
+        TokenEnhancerChain enhancerChain = new TokenEnhancerChain();
+        enhancerChain.setTokenEnhancers(
+                Arrays.asList(customTokenEnhancer, accessTokenConverter()));
+
         endpoints
                 .tokenStore(tokenStore())
+                .tokenEnhancer(enhancerChain)
                 .accessTokenConverter(accessTokenConverter())
-                .authenticationManager(authenticationManager)
-                .userDetailsService(userDetailsService);
+                .authenticationManager(authenticationManager);
     }
 }

@@ -2,7 +2,6 @@ package com.oauth.rest.security;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.BeanIds;
@@ -15,14 +14,13 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 
 @Configuration
 @EnableWebSecurity
-@Order(1)
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     private final PasswordEncoder passwordEncoder;
     private final UserDetailsService userDetailsService;
 
     public SecurityConfig(PasswordEncoder passwordEncoder,
-                          UserDetailsService userDetailsService) {
+            UserDetailsService userDetailsService) {
         this.passwordEncoder = passwordEncoder;
         this.userDetailsService = userDetailsService;
     }
@@ -31,26 +29,26 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception {
 
         http
-            .cors()
-            .and()
-            .csrf().disable()
-            .requestMatchers()
+                .cors()
+                .and()
+                .csrf().disable()
+                .requestMatchers()
                 .antMatchers("/login", "/oauth/authorize", "/oauth/token")
-            .and()
-            .authorizeRequests()
+                .and()
+                .authorizeRequests()
                 .antMatchers(HttpMethod.OPTIONS, "/oauth/**").permitAll()
                 .antMatchers("/oauth/token").permitAll()
                 .anyRequest().authenticated()
-            .and()
-            .formLogin()
+                .and()
+                .formLogin()
                 .permitAll();
     }
 
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
         auth
-            .userDetailsService(userDetailsService)
-            .passwordEncoder(passwordEncoder);
+                .userDetailsService(userDetailsService)
+                .passwordEncoder(passwordEncoder);
     }
 
     @Bean(BeanIds.AUTHENTICATION_MANAGER)

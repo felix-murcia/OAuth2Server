@@ -52,6 +52,9 @@ public class UserEntity implements UserDetails {
 
     private LocalDateTime lastPasswordChangeAt = LocalDateTime.now();
 
+    @Column(name = "app")
+    private String application;
+
     public UserEntity() {
     }
 
@@ -158,5 +161,13 @@ public class UserEntity implements UserDetails {
     @Override
     public boolean isEnabled() {
         return true;
+    }
+
+    public String getApplication() {
+        return application;
+    }
+
+    public void setApplication(String application) {
+        this.application = application;
     }
 }
