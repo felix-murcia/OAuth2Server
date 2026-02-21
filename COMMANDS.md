@@ -386,7 +386,13 @@ kubectl port-forward -n auth svc/oauth2-server 8080:8080
 kubectl logs -n auth -l app=oauth2-server --tail=200 -f
 ```
 
-## 🔐 Petición OAuth2 (password grant)
+## 📄 Documentación API (Swagger UI)
+
+```bash
+http://localhost:8080/swagger-ui.html
+```
+
+## � Petición OAuth2 (password grant)
 
 ```bash
 curl -X POST \
