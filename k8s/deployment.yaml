@@ -30,6 +30,12 @@ spec:
                   name: oauth2-secrets
                   key: jwt-signing-key
 
+            - name: JWT_AUDIENCE
+              valueFrom:
+                secretKeyRef:
+                  name: oauth2-secrets
+                  key: oauth-audience
+
             - name: OAUTH_CLIENT_ID
               valueFrom:
                 secretKeyRef:

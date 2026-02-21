@@ -23,8 +23,8 @@ El proyecto está preparado para ejecutarse tanto en **entornos locales** (H2, D
   - Endpoints REST para consulta y creación de usuarios
 
 - **Migraciones Flyway**  
-  - `V1__init_schema_and_admin.sql`  
-  - `V2__update_passwords_bcrypt.sql`  
+  - `V4__add_field_aplicacion.sql`  
+  - `V5__add_user_field_app.sql`  
   Garantizan un esquema consistente en todos los entornos.
 
 - **Base de datos flexible**  
@@ -124,10 +124,10 @@ docker run -p 8080:8080 oauth2server
 
 ```bash
 curl -X POST \
-  -u "client_id:client_secret" \
+  -u "proveedor-oauth:123456" \
   -d "grant_type=password" \
   -d "username=admin" \
-  -d "password=PASSWORD" \
+  -d "password=admin" \
   http://localhost:8080/oauth/token
 ```
 
@@ -135,10 +135,12 @@ curl -X POST \
 
 ```bash
 curl -X POST \
-  -u "client_id:client_secret" \
+  -u "proveedor-oauth:123456" \
   -d "grant_type=client_credentials" \
   http://localhost:8080/oauth/token
 ```
+
+> **Nota:** Las credenciales `proveedor-oauth:123456` corresponden al perfil de desarrollo (`application-dev.properties`). En producción, estas variables se configuran mediante las variables de entorno `OAUTH_CLIENT_ID` y `OAUTH_CLIENT_SECRET`.
 
 ---
 
@@ -179,19 +181,19 @@ kubectl port-forward -n auth svc/oauth2-server 8080:8080
 El archivo de base de datos se guarda en:
 
 ```
-/data/oauth2db.mv.db
+/app/data/oauth2db.mv.db
 ```
 
 ### Copiar la BD desde el pod al host
 
 ```bash
-kubectl cp auth/<POD>:/data/oauth2db.mv.db ./oauth2db.mv.db
+kubectl cp auth/<POD>:/app/data/oauth2db.mv.db ./oauth2db.mv.db
 ```
 
 ### Copiar la BD desde el host al pod
 
 ```bash
-kubectl cp ./oauth2db.mv.db auth/<POD>:/data/oauth2db.mv.db
+kubectl cp ./oauth2db.mv.db auth/<POD>:/app/data/oauth2db.mv.db
 ```
 
 ---
@@ -219,12 +221,11 @@ PY
 
 Se definen en `k8s/secrets.yaml` (codificadas en base64):
 
-- `JWT_SIGNING_KEY`
-- `DB_URL`
-- `DB_USER`
-- `DB_PASS`
-- `OAUTH_CLIENT_ID`
-- `OAUTH_CLIENT_SECRET`
+- `jwt-signing-key` - Clave secreta para firmar tokens JWT
+- `oauth-client-id` - ID del cliente OAuth2
+- `oauth-client-secret` - Secreto del cliente OAuth2
+- `oauth-redirect-uri` - URI de redirección OAuth2
+- `oauth-audience` - Audience para JWT
 
 Ejemplo:
 
@@ -236,10 +237,11 @@ metadata:
   namespace: auth
 type: Opaque
 data:
-  jwt-key: <base64>
-  db-url: <base64>
-  db-user: <base64>
-  db-pass: <base64>
+  jwt-signing-key: <base64>
+  oauth-client-id: <base64>
+  oauth-client-secret: <base64>
+  oauth-redirect-uri: <base64>
+  oauth-audience: <base64>
 ```
 
 ---
