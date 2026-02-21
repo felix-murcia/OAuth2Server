@@ -4,6 +4,8 @@ target/
 !**/src/main/**/target/
 !**/src/test/**/target/
 
+.mvn/
+
 ### STS ###
 .apt_generated
 .classpath
@@ -40,3 +42,4 @@ k8s/secrets.yaml
 
 # Flyway
 src/main/resources/db/migration/*
+src/main/resources/data.sql

@@ -120,27 +120,95 @@ docker run -p 8080:8080 oauth2server
 
 ## 🔐 Obtener un token OAuth2
 
-### Password Grant
+### 📋 Requisitos previos
+
+Antes de obtener un token, asegúrate de que:
+1. La aplicación esté corriendo en el puerto 8080 (o el puerto configurado)
+2. La base de datos tenga usuarios inicializados (el usuario `admin` se crea automáticamente)
+
+### 🚀 Iniciar la aplicación
+
+```bash
+# En desarrollo
+mvn spring-boot:run
+```
+
+O si hay conflictos de puerto:
+```bash
+export SPRING_PROFILES_ACTIVE=dev
+mvn spring-boot:run
+```
+
+### 🔑 Password Grant (Recomendado para usuarios finales)
 
 ```bash
 curl -X POST \
+  -H "Content-Type: application/x-www-form-urlencoded" \
   -u "proveedor-oauth:123456" \
   -d "grant_type=password" \
   -d "username=admin" \
-  -d "password=admin" \
+  -d "password=Admin1" \
+  -d "scope=read write" \
   http://localhost:8080/oauth/token
 ```
 
-### Client Credentials
+**Parámetros:**
+- `grant_type`: Debe ser `"password"`
+- `username`: Nombre de usuario (por defecto: `admin`)
+- `password`: Contraseña del usuario (por defecto: `Admin1`)
+- `scope`: scopes separados por espacio (por defecto: `read write`)
+
+**Ejemplo de respuesta:**
+```json
+{
+  "access_token": "eyJraWQiOiJmMGI3NTZmOS04ZTZjLTRhYWUtODBjMC04NjUzNzQ3NWZiOTMiLCJhbGciOiJSUzI1NiJ9...",
+  "token_type": "Bearer",
+  "expires_in": 86400,
+  "scope": "read write"
+}
+```
+
+### 🔐 Client Credentials (Para servicios/máquinas)
 
 ```bash
 curl -X POST \
+  -H "Content-Type: application/x-www-form-urlencoded" \
   -u "proveedor-oauth:123456" \
   -d "grant_type=client_credentials" \
+  -d "scope=read write" \
   http://localhost:8080/oauth/token
 ```
 
-> **Nota:** Las credenciales `proveedor-oauth:123456` corresponden al perfil de desarrollo (`application-dev.properties`). En producción, estas variables se configuran mediante las variables de entorno `OAUTH_CLIENT_ID` y `OAUTH_CLIENT_SECRET`.
+**Ejemplo de respuesta:**
+```json
+{
+  "access_token": "eyJraWQiOiJmMGI3NTZmOS04ZTZjLTRhYWUtODBjMC04NjUzNzQ3NWZiOTMiLCJhbGciOiJSUzI1NiJ9...",
+  "token_type": "Bearer",
+  "expires_in": 86400,
+  "scope": "read write"
+}
+```
+
+### ✅ Verificar el token
+
+```bash
+curl -X GET \
+  -H "Authorization: Bearer <TOKEN_OBTENIDO>" \
+  http://localhost:8080/user/me
+```
+
+### 📝 Credenciales por defecto
+
+Las credenciales se configuran en el archivo `application-dev.properties`:
+
+```properties
+oauth2.client-id=proveedor-oauth
+oauth2.client-secret=123456
+oauth2.default-user.username=admin
+oauth2.default-user.password=Admin1
+```
+
+> **Nota:** Estas credenciales corresponden al perfil de desarrollo (`application-dev.properties`). En producción, estas variables se configuran mediante las variables de entorno o el archivo `application-prod.properties`.
 
 ---
 

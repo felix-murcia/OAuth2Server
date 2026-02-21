@@ -1,11 +1,7 @@
 
-drop sequence if exists hibernate_sequence;
-create sequence hibernate_sequence start with 1000 increment by 1;
-
-
 -- Contraseña: Admin1
-insert into usuarios (id, full_name, email, username, password, avatar, created_at, last_password_change_at) 
-values (1, 'Admin admin', 'admin@oauth.net','admin','$2a$10$55jeMnYoXio8BTaQDtnc0OxjdQyv43TQ0D48YAkMGAFuswr944ZBC','https://api.adorable.io/avatars/285/admin@oauth.net.png',CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
+insert into usuarios (id, full_name, email, username, password, created_at, last_password_change_at) 
+values (1, 'Admin admin', 'admin@oauth.net','admin','$2a$10$55jeMnYoXio8BTaQDtnc0OxjdQyv43TQ0D48YAkMGAFuswr944ZBC',CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
 
 insert into user_entity_roles (user_entity_id, roles) values (1,'USER');
 insert into user_entity_roles (user_entity_id, roles) values (1,'ADMIN');
