@@ -1,13 +1,10 @@
 package com.oauth.rest.service;
 
-import com.oauth.rest.model.UserEntity;
 import com.oauth.rest.repository.UserEntityRepository;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
-
-import java.util.Optional;
 
 @Service("userDetailsService")
 public class CustomUserDetailsService implements UserDetailsService {
