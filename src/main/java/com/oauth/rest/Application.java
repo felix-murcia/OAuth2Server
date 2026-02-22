@@ -14,8 +14,5 @@ public class Application {
 
 		// Verificar configuración (solo para depuración)
 		System.out.println("✅ Perfiles activos: " + String.join(", ", env.getActiveProfiles()));
-		System.out.println("✅ URL H2: " + env.getProperty("spring.datasource.url"));
-		System.out.println("✅ Driver: " + env.getProperty("spring.datasource.driverClassName"));
-		System.out.println("✅ Puerto: " + env.getProperty("server.port"));
 	}
 }

@@ -32,6 +32,8 @@ import java.security.KeyPairGenerator;
 import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
 import java.time.Duration;
+import java.util.Arrays;
+import java.util.List;
 import java.util.UUID;
 
 @Configuration
@@ -78,8 +80,8 @@ public class OAuth2AuthorizationServer {
 
     @Bean
     public RegisteredClientRepository registeredClientRepository(PasswordEncoder passwordEncoder) {
-        // Client para aplicaciones web (Authorization Code + PKCE)
-        RegisteredClient webClient = RegisteredClient.withId(UUID.randomUUID().toString())
+        // Cliente para la aplicación principal (proveedor-oauth)
+        RegisteredClient mainClient = RegisteredClient.withId(UUID.randomUUID().toString())
                 .clientId(clientId)
                 .clientSecret(passwordEncoder.encode(clientSecret))
                 // Authorization Code Flow con PKCE
@@ -106,7 +108,77 @@ public class OAuth2AuthorizationServer {
                 .redirectUri(redirectUri)
                 .build();
 
-        return new InMemoryRegisteredClientRepository(webClient);
+        // Cliente para cine-platform (aplicación de ejemplo)
+        RegisteredClient cinePlatformClient = RegisteredClient.withId(UUID.randomUUID().toString())
+                .clientId("cine-platform")
+                .clientSecret(passwordEncoder.encode("cine-platform-secret"))
+                .authorizationGrantType(AuthorizationGrantType.AUTHORIZATION_CODE)
+                .authorizationGrantType(AuthorizationGrantType.REFRESH_TOKEN)
+                .clientSettings(ClientSettings.builder()
+                        .requireAuthorizationConsent(true)
+                        .requireProofKey(true)
+                        .build())
+                .tokenSettings(TokenSettings.builder()
+                        .accessTokenTimeToLive(Duration.ofSeconds(accessTokenValiditySeconds))
+                        .refreshTokenTimeToLive(Duration.ofSeconds(refreshTokenValiditySeconds))
+                        .reuseRefreshTokens(false)
+                        .build())
+                .scope("openid")
+                .scope("profile")
+                .scope("read")
+                .scope("write")
+                .redirectUri("http://localhost:3000/callback")
+                .build();
+
+        // Cliente para cine-admin (panel de administración)
+        RegisteredClient cineAdminClient = RegisteredClient.withId(UUID.randomUUID().toString())
+                .clientId("cine-admin")
+                .clientSecret(passwordEncoder.encode("cine-admin-secret"))
+                .authorizationGrantType(AuthorizationGrantType.AUTHORIZATION_CODE)
+                .authorizationGrantType(AuthorizationGrantType.REFRESH_TOKEN)
+                .clientSettings(ClientSettings.builder()
+                        .requireAuthorizationConsent(true)
+                        .requireProofKey(true)
+                        .build())
+                .tokenSettings(TokenSettings.builder()
+                        .accessTokenTimeToLive(Duration.ofSeconds(accessTokenValiditySeconds))
+                        .refreshTokenTimeToLive(Duration.ofSeconds(refreshTokenValiditySeconds))
+                        .reuseRefreshTokens(false)
+                        .build())
+                .scope("openid")
+                .scope("profile")
+                .scope("admin:users")
+                .scope("admin:roles")
+                .redirectUri("http://localhost:4000/callback")
+                .build();
+
+        // Cliente para otra-app (ejemplo adicional)
+        RegisteredClient otraAppClient = RegisteredClient.withId(UUID.randomUUID().toString())
+                .clientId("otra-app")
+                .clientSecret(passwordEncoder.encode("otra-app-secret"))
+                .authorizationGrantType(AuthorizationGrantType.AUTHORIZATION_CODE)
+                .authorizationGrantType(AuthorizationGrantType.REFRESH_TOKEN)
+                .clientSettings(ClientSettings.builder()
+                        .requireAuthorizationConsent(true)
+                        .requireProofKey(true)
+                        .build())
+                .tokenSettings(TokenSettings.builder()
+                        .accessTokenTimeToLive(Duration.ofSeconds(accessTokenValiditySeconds))
+                        .refreshTokenTimeToLive(Duration.ofSeconds(refreshTokenValiditySeconds))
+                        .reuseRefreshTokens(false)
+                        .build())
+                .scope("openid")
+                .scope("profile")
+                .redirectUri("http://localhost:5000/callback")
+                .build();
+
+        List<RegisteredClient> clients = Arrays.asList(
+                mainClient,
+                cinePlatformClient,
+                cineAdminClient,
+                otraAppClient);
+
+        return new InMemoryRegisteredClientRepository(clients);
     }
 
     @Bean
