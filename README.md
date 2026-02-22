@@ -10,11 +10,11 @@ El proyecto está preparado para ejecutarse tanto en **entornos locales** (H2, D
 
 - **Servidor OAuth2 completo**  
   Implementación de los flujos:
-  - *Password Grant*
-  - *Client Credentials*
+  - **Authorization Code + PKCE** (para aplicaciones web/móviles)
+  - **Client Credentials** (para M2M)
 
 - **JWT firmado**  
-  Tokens firmados con clave configurable (HMAC), listos para validación en microservicios.
+  Tokens firmados con clave RSA, listos para validación en microservicios.
 
 - **Gestión de usuarios**  
   - Entidad `UserEntity`  
@@ -118,57 +118,55 @@ docker run -p 8080:8080 oauth2server
 
 ---
 
-## 🔐 Obtener un token OAuth2
+## 🔐 Flujos OAuth2 soportados
 
-### 📋 Requisitos previos
+### 1. Authorization Code + PKCE (Recomendado para usuarios)
 
-Antes de obtener un token, asegúrate de que:
-1. La aplicación esté corriendo en el puerto 8080 (o el puerto configurado)
-2. La base de datos tenga usuarios inicializados (el usuario `admin` se crea automáticamente)
+Este es el flujo estándar para aplicaciones web y móviles. Requiere:
 
-### 🚀 Iniciar la aplicación
-
-```bash
-# En desarrollo
-mvn spring-boot:run
+1. **Redireccionar al usuario al endpoint de autorización:**
+```
+http://localhost:8080/oauth2/authorize?
+  response_type=code&
+  client_id=proveedor-oauth&
+  redirect_uri=http://localhost:3000/callback&
+  scope=openid%20profile%20read%20write&
+  code_challenge=E9Melhoa2OwvFrEMTJguCHaoeK1t8URWbuGJSstw-cM&
+  code_challenge_method=S256
 ```
 
-O si hay conflictos de puerto:
-```bash
-export SPRING_PROFILES_ACTIVE=dev
-mvn spring-boot:run
+2. **El usuario se autentica en la página de login** (`/login`)
+
+3. **Después del login, el servidor redirige al callback con el código:**
+```
+http://localhost:3000/callback?code=xxx
 ```
 
-### 🔑 Password Grant (Recomendado para usuarios finales)
-
+4. **Canjea el código por tokens:**
 ```bash
 curl -X POST \
   -H "Content-Type: application/x-www-form-urlencoded" \
   -u "proveedor-oauth:123456" \
-  -d "grant_type=password" \
-  -d "username=admin" \
-  -d "password=Admin1" \
-  -d "scope=read write" \
-  http://localhost:8080/oauth/token
+  -d "grant_type=authorization_code" \
+  -d "code=CODIGO_RECIBIDO" \
+  -d "redirect_uri=http://localhost:3000/callback" \
+  -d "code_verifier=dBjftJeZ4CVP-mB92K27uhbUJU1p1r_wW1gFWFOEjXk" \
+  http://localhost:8080/oauth2/token
 ```
 
-**Parámetros:**
-- `grant_type`: Debe ser `"password"`
-- `username`: Nombre de usuario (por defecto: `admin`)
-- `password`: Contraseña del usuario (por defecto: `Admin1`)
-- `scope`: scopes separados por espacio (por defecto: `read write`)
-
-**Ejemplo de respuesta:**
+**Respuesta:**
 ```json
 {
-  "access_token": "eyJraWQiOiJmMGI3NTZmOS04ZTZjLTRhYWUtODBjMC04NjUzNzQ3NWZiOTMiLCJhbGciOiJSUzI1NiJ9...",
+  "access_token": "eyJraWQiOi...",
+  "id_token": "eyJraWQiOi...",
   "token_type": "Bearer",
   "expires_in": 86400,
-  "scope": "read write"
+  "refresh_token": "xxx",
+  "scope": "openid profile read write"
 }
 ```
 
-### 🔐 Client Credentials (Para servicios/máquinas)
+### 2. Client Credentials (M2M)
 
 ```bash
 curl -X POST \
@@ -176,39 +174,24 @@ curl -X POST \
   -u "proveedor-oauth:123456" \
   -d "grant_type=client_credentials" \
   -d "scope=read write" \
-  http://localhost:8080/oauth/token
+  http://localhost:8080/oauth2/token
 ```
 
-**Ejemplo de respuesta:**
-```json
-{
-  "access_token": "eyJraWQiOiJmMGI3NTZmOS04ZTZjLTRhYWUtODBjMC04NjUzNzQ3NWZiOTMiLCJhbGciOiJSUzI1NiJ9...",
-  "token_type": "Bearer",
-  "expires_in": 86400,
-  "scope": "read write"
-}
-```
+---
 
-### ✅ Verificar el token
+## 📝 Credenciales por defecto
 
-```bash
-curl -X GET \
-  -H "Authorization: Bearer <TOKEN_OBTENIDO>" \
-  http://localhost:8080/user/me
-```
-
-### 📝 Credenciales por defecto
-
-Las credenciales se configuran en el archivo `application-dev.properties`:
+Las credenciales del cliente OAuth2 y usuario se configuran en el archivo `.env`:
 
 ```properties
-oauth2.client-id=proveedor-oauth
-oauth2.client-secret=123456
-oauth2.default-user.username=admin
-oauth2.default-user.password=Admin1
-```
+# Cliente OAuth2
+OAUTH_CLIENT_ID=proveedor-oauth
+OAUTH_CLIENT_SECRET=123456
 
-> **Nota:** Estas credenciales corresponden al perfil de desarrollo (`application-dev.properties`). En producción, estas variables se configuran mediante las variables de entorno o el archivo `application-prod.properties`.
+# Usuario por defecto
+DEFAULT_ADMIN_USERNAME=admin
+DEFAULT_ADMIN_PASSWORD=Admin1
+```
 
 ---
 
@@ -319,5 +302,3 @@ data:
 MIT
 
 ---
-
-

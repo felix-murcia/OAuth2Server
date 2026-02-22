@@ -6,6 +6,9 @@ target/
 
 .mvn/
 
+application-secrets.properties
+.env
+
 ### STS ###
 .apt_generated
 .classpath

@@ -7,8 +7,8 @@
 [[1;34mINFO[m] [1m>>> [0;32mspring-boot-maven-plugin:3.5.11:run[m [1m(default-cli)[0;1m > [0;1mtest-compile[m @ [36mOAuth2Server[0;1m >>>[m
 [[1;34mINFO[m] 
 [[1;34mINFO[m] [1m--- [0;32mmaven-resources-plugin:3.3.1:resources[m [1m(default-resources)[m @ [36mOAuth2Server[0;1m ---[m
-[[1;34mINFO[m] Copying 3 resources from src/main/resources to target/classes
-[[1;34mINFO[m] Copying 6 resources from src/main/resources to target/classes
+[[1;34mINFO[m] Copying 4 resources from src/main/resources to target/classes
+[[1;34mINFO[m] Copying 7 resources from src/main/resources to target/classes
 [[1;34mINFO[m] 
 [[1;34mINFO[m] [1m--- [0;32mmaven-compiler-plugin:3.13.0:compile[m [1m(default-compile)[m @ [36mOAuth2Server[0;1m ---[m
 [[1;34mINFO[m] Nothing to compile - all classes are up to date.
@@ -34,192 +34,92 @@
 
  :: Spring Boot ::               (v3.5.11)
 
-2026-02-21T22:47:52.404+01:00  INFO 1810339 --- [           main] com.oauth.rest.Application               : Starting Application using Java 21.0.10 with PID 1810339 (/home/jetson/Public/casino/OAuth2Server/target/classes started by jetson in /home/jetson/Public/casino/OAuth2Server)
-2026-02-21T22:47:52.410+01:00  INFO 1810339 --- [           main] com.oauth.rest.Application               : The following 1 profile is active: "dev"
-2026-02-21T22:47:54.272+01:00  INFO 1810339 --- [           main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
-2026-02-21T22:47:54.405+01:00  INFO 1810339 --- [           main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 101 ms. Found 1 JPA repository interface.
-2026-02-21T22:47:55.701+01:00  INFO 1810339 --- [           main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port 8080 (http)
-2026-02-21T22:47:55.729+01:00  INFO 1810339 --- [           main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
-2026-02-21T22:47:55.729+01:00  INFO 1810339 --- [           main] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/10.1.52]
-2026-02-21T22:47:55.848+01:00  INFO 1810339 --- [           main] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring embedded WebApplicationContext
-2026-02-21T22:47:55.851+01:00  INFO 1810339 --- [           main] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 3351 ms
-2026-02-21T22:47:56.374+01:00  INFO 1810339 --- [           main] o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: default]
-2026-02-21T22:47:56.507+01:00  INFO 1810339 --- [           main] org.hibernate.Version                    : HHH000412: Hibernate ORM core version 6.6.42.Final
-2026-02-21T22:47:56.587+01:00  INFO 1810339 --- [           main] o.h.c.internal.RegionFactoryInitiator    : HHH000026: Second-level cache disabled
-2026-02-21T22:47:57.629+01:00  INFO 1810339 --- [           main] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
-2026-02-21T22:47:57.698+01:00  INFO 1810339 --- [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
-2026-02-21T22:47:58.904+01:00  WARN 1810339 --- [           main] o.h.engine.jdbc.spi.SqlExceptionHelper   : SQL Error: 90020, SQLState: 90020
-2026-02-21T22:47:58.905+01:00 ERROR 1810339 --- [           main] o.h.engine.jdbc.spi.SqlExceptionHelper   : Database may be already in use: "/home/jetson/data/oauth2db.mv.db". Possible solutions: close all other connection(s); use the server mode [90020-232]
-2026-02-21T22:47:58.907+01:00  WARN 1810339 --- [           main] o.h.e.j.e.i.JdbcEnvironmentInitiator     : HHH000342: Could not obtain connection to query metadata
-
-org.hibernate.exception.GenericJDBCException: unable to obtain isolated JDBC connection [Database may be already in use: "/home/jetson/data/oauth2db.mv.db". Possible solutions: close all other connection(s); use the server mode [90020-232]] [n/a]
-	at org.hibernate.exception.internal.StandardSQLExceptionConverter.convert(StandardSQLExceptionConverter.java:63) ~[hibernate-core-6.6.42.Final.jar:6.6.42.Final]
-	at org.hibernate.engine.jdbc.spi.SqlExceptionHelper.convert(SqlExceptionHelper.java:108) ~[hibernate-core-6.6.42.Final.jar:6.6.42.Final]
-	at org.hibernate.engine.jdbc.spi.SqlExceptionHelper.convert(SqlExceptionHelper.java:94) ~[hibernate-core-6.6.42.Final.jar:6.6.42.Final]
-	at org.hibernate.resource.transaction.backend.jdbc.internal.JdbcIsolationDelegate.delegateWork(JdbcIsolationDelegate.java:116) ~[hibernate-core-6.6.42.Final.jar:6.6.42.Final]
-	at org.hibernate.engine.jdbc.env.internal.JdbcEnvironmentInitiator.getJdbcEnvironmentUsingJdbcMetadata(JdbcEnvironmentInitiator.java:334) ~[hibernate-core-6.6.42.Final.jar:6.6.42.Final]
-	at org.hibernate.engine.jdbc.env.internal.JdbcEnvironmentInitiator.initiateService(JdbcEnvironmentInitiator.java:129) ~[hibernate-core-6.6.42.Final.jar:6.6.42.Final]
-	at org.hibernate.engine.jdbc.env.internal.JdbcEnvironmentInitiator.initiateService(JdbcEnvironmentInitiator.java:81) ~[hibernate-core-6.6.42.Final.jar:6.6.42.Final]
-	at org.hibernate.boot.registry.internal.StandardServiceRegistryImpl.initiateService(StandardServiceRegistryImpl.java:130) ~[hibernate-core-6.6.42.Final.jar:6.6.42.Final]
-	at org.hibernate.service.internal.AbstractServiceRegistryImpl.createService(AbstractServiceRegistryImpl.java:263) ~[hibernate-core-6.6.42.Final.jar:6.6.42.Final]
-	at org.hibernate.service.internal.AbstractServiceRegistryImpl.initializeService(AbstractServiceRegistryImpl.java:238) ~[hibernate-core-6.6.42.Final.jar:6.6.42.Final]
-	at org.hibernate.service.internal.AbstractServiceRegistryImpl.getService(AbstractServiceRegistryImpl.java:215) ~[hibernate-core-6.6.42.Final.jar:6.6.42.Final]
-	at org.hibernate.boot.model.relational.Database.<init>(Database.java:45) ~[hibernate-core-6.6.42.Final.jar:6.6.42.Final]
-	at org.hibernate.boot.internal.InFlightMetadataCollectorImpl.getDatabase(InFlightMetadataCollectorImpl.java:226) ~[hibernate-core-6.6.42.Final.jar:6.6.42.Final]
-	at org.hibernate.boot.internal.InFlightMetadataCollectorImpl.<init>(InFlightMetadataCollectorImpl.java:194) ~[hibernate-core-6.6.42.Final.jar:6.6.42.Final]
-	at org.hibernate.boot.model.process.spi.MetadataBuildingProcess.complete(MetadataBuildingProcess.java:171) ~[hibernate-core-6.6.42.Final.jar:6.6.42.Final]
-	at org.hibernate.jpa.boot.internal.EntityManagerFactoryBuilderImpl.metadata(EntityManagerFactoryBuilderImpl.java:1442) ~[hibernate-core-6.6.42.Final.jar:6.6.42.Final]
-	at org.hibernate.jpa.boot.internal.EntityManagerFactoryBuilderImpl.build(EntityManagerFactoryBuilderImpl.java:1513) ~[hibernate-core-6.6.42.Final.jar:6.6.42.Final]
-	at org.springframework.orm.jpa.vendor.SpringHibernateJpaPersistenceProvider.createContainerEntityManagerFactory(SpringHibernateJpaPersistenceProvider.java:66) ~[spring-orm-6.2.16.jar:6.2.16]
-	at org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean.createNativeEntityManagerFactory(LocalContainerEntityManagerFactoryBean.java:388) ~[spring-orm-6.2.16.jar:6.2.16]
-	at org.springframework.orm.jpa.AbstractEntityManagerFactoryBean.buildNativeEntityManagerFactory(AbstractEntityManagerFactoryBean.java:419) ~[spring-orm-6.2.16.jar:6.2.16]
-	at org.springframework.orm.jpa.AbstractEntityManagerFactoryBean.afterPropertiesSet(AbstractEntityManagerFactoryBean.java:400) ~[spring-orm-6.2.16.jar:6.2.16]
-	at org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean.afterPropertiesSet(LocalContainerEntityManagerFactoryBean.java:364) ~[spring-orm-6.2.16.jar:6.2.16]
-	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.invokeInitMethods(AbstractAutowireCapableBeanFactory.java:1873) ~[spring-beans-6.2.16.jar:6.2.16]
-	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.initializeBean(AbstractAutowireCapableBeanFactory.java:1822) ~[spring-beans-6.2.16.jar:6.2.16]
-	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.doCreateBean(AbstractAutowireCapableBeanFactory.java:607) ~[spring-beans-6.2.16.jar:6.2.16]
-	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBean(AbstractAutowireCapableBeanFactory.java:529) ~[spring-beans-6.2.16.jar:6.2.16]
-	at org.springframework.beans.factory.support.AbstractBeanFactory.lambda$doGetBean$0(AbstractBeanFactory.java:339) ~[spring-beans-6.2.16.jar:6.2.16]
-	at org.springframework.beans.factory.support.DefaultSingletonBeanRegistry.getSingleton(DefaultSingletonBeanRegistry.java:373) ~[spring-beans-6.2.16.jar:6.2.16]
-	at org.springframework.beans.factory.support.AbstractBeanFactory.doGetBean(AbstractBeanFactory.java:337) ~[spring-beans-6.2.16.jar:6.2.16]
-	at org.springframework.beans.factory.support.AbstractBeanFactory.getBean(AbstractBeanFactory.java:207) ~[spring-beans-6.2.16.jar:6.2.16]
-	at org.springframework.context.support.AbstractApplHibernate: 
-    select
-        ue1_0.id,
-        ue1_0.app,
-        ue1_0.created_at,
-        ue1_0.email,
-        ue1_0.full_name,
-        ue1_0.last_password_change_at,
-        ue1_0.password,
-        ue1_0.username 
-    from
-        usuarios ue1_0 
-    where
-        ue1_0.username=?
+2026-02-22T16:21:38.764+01:00  INFO 280841 --- [           main] com.oauth.rest.Application               : Starting Application using Java 21.0.10 with PID 280841 (/home/jetson/Public/casino/OAuth2Server/target/classes started by jetson in /home/jetson/Public/casino/OAuth2Server)
+2026-02-22T16:21:38.769+01:00  INFO 280841 --- [           main] com.oauth.rest.Application               : The following 1 profile is active: "dev"
+2026-02-22T16:21:40.243+01:00  INFO 280841 --- [           main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2026-02-22T16:21:40.337+01:00  INFO 280841 --- [           main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 79 ms. Found 1 JPA repository interface.
+2026-02-22T16:21:41.503+01:00  INFO 280841 --- [           main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port 8080 (http)
+2026-02-22T16:21:41.529+01:00  INFO 280841 --- [           main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2026-02-22T16:21:41.530+01:00  INFO 280841 --- [           main] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/10.1.52]
+2026-02-22T16:21:41.633+01:00  INFO 280841 --- [           main] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring embedded WebApplicationContext
+2026-02-22T16:21:41.635+01:00  INFO 280841 --- [           main] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 2784 ms
+2026-02-22T16:21:42.100+01:00  INFO 280841 --- [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+2026-02-22T16:21:42.429+01:00  INFO 280841 --- [           main] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection conn0: url=jdbc:h2:mem:oauth2db user=SA
+2026-02-22T16:21:42.432+01:00  INFO 280841 --- [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+2026-02-22T16:21:42.514+01:00  INFO 280841 --- [           main] org.flywaydb.core.FlywayExecutor         : Database: jdbc:h2:mem:oauth2db (H2 2.3)
+2026-02-22T16:21:42.570+01:00  INFO 280841 --- [           main] o.f.c.i.s.JdbcTableSchemaHistory         : Schema history table "PUBLIC"."flyway_schema_history" does not exist yet
+2026-02-22T16:21:42.574+01:00  INFO 280841 --- [           main] o.f.core.internal.command.DbValidate     : Successfully validated 6 migrations (execution time 00:00.031s)
+2026-02-22T16:21:42.588+01:00  INFO 280841 --- [           main] org.flywaydb.core.Flyway                 : All configured schemas are empty; baseline operation skipped. A baseline or migration script with a lower version than the baseline version may execute if available. Check the Schemas parameter if this is not intended.
+2026-02-22T16:21:42.590+01:00  INFO 280841 --- [           main] o.f.c.i.s.JdbcTableSchemaHistory         : Creating Schema History table "PUBLIC"."flyway_schema_history" ...
+2026-02-22T16:21:42.649+01:00  INFO 280841 --- [           main] o.f.core.internal.command.DbMigrate      : Current version of schema "PUBLIC": << Empty Schema >>
+2026-02-22T16:21:42.664+01:00  INFO 280841 --- [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "1 - init schema and admin"
+2026-02-22T16:21:42.695+01:00  INFO 280841 --- [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "2 - add user juanaco"
+2026-02-22T16:21:42.705+01:00  INFO 280841 --- [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "3 - update passwords bcrypt"
+2026-02-22T16:21:42.718+01:00  INFO 280841 --- [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "4 - add field aplicacion"
+2026-02-22T16:21:42.736+01:00  INFO 280841 --- [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "5 - add user field app"
+2026-02-22T16:21:42.745+01:00  INFO 280841 --- [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "6 - create usuarios seq"
+2026-02-22T16:21:42.761+01:00  INFO 280841 --- [           main] o.f.core.internal.command.DbMigrate      : Successfully applied 6 migrations to schema "PUBLIC", now at version v6 (execution time 00:00.037s)
+2026-02-22T16:21:42.905+01:00  INFO 280841 --- [           main] o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: default]
+2026-02-22T16:21:43.000+01:00  INFO 280841 --- [           main] org.hibernate.Version                    : HHH000412: Hibernate ORM core version 6.6.42.Final
+2026-02-22T16:21:43.063+01:00  INFO 280841 --- [           main] o.h.c.internal.RegionFactoryInitiator    : HHH000026: Second-level cache disabled
+2026-02-22T16:21:43.544+01:00  INFO 280841 --- [           main] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2026-02-22T16:21:43.626+01:00  WARN 280841 --- [           main] org.hibernate.orm.deprecation            : HHH90000025: H2Dialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+2026-02-22T16:21:43.649+01:00  INFO 280841 --- [           main] org.hibernate.orm.connections.pooling    : HHH10001005: Database info:
+	Database JDBC URL [Connecting through datasource 'HikariDataSource (HikariPool-1)']
+	Database driver: undefined/unknown
+	Database version: 2.3.232
+	Autocommit mode: undefined/unknown
+	Isolation level: undefined/unknown
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2026-02-22T16:21:45.115+01:00  INFO 280841 --- [           main] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2026-02-22T16:21:45.162+01:00  INFO 280841 --- [           main] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2026-02-22T16:21:48.190+01:00  WARN 280841 --- [           main] JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2026-02-22T16:21:48.524+01:00  INFO 280841 --- [           main] r$InitializeUserDetailsManagerConfigurer : Global AuthenticationManager configured with UserDetailsService bean with name userDetailsService
+2026-02-22T16:21:48.683+01:00 DEBUG 280841 --- [           main] o.s.s.web.DefaultSecurityFilterChain     : Will secure Or [Mvc [pattern='/**']] with filters: DisableEncodeUrlFilter, WebAsyncManagerIntegrationFilter, SecurityContextHolderFilter, HeaderWriterFilter, CorsFilter, LogoutFilter, UsernamePasswordAuthenticationFilter, RequestCacheAwareFilter, SecurityContextHolderAwareRequestFilter, AnonymousAuthenticationFilter, ExceptionTranslationFilter, AuthorizationFilter
+2026-02-22T16:21:48.698+01:00 DEBUG 280841 --- [           main] o.s.s.web.DefaultSecurityFilterChain     : Will secure Or [Mvc [pattern='/h2-console/**']] with filters: DisableEncodeUrlFilter, WebAsyncManagerIntegrationFilter, SecurityContextHolderFilter, HeaderWriterFilter, CorsFilter, LogoutFilter, RequestCacheAwareFilter, SecurityContextHolderAwareRequestFilter, AnonymousAuthenticationFilter, ExceptionTranslationFilter, AuthorizationFilter
+2026-02-22T16:21:49.017+01:00 DEBUG 280841 --- [           main] o.s.s.web.DefaultSecurityFilterChain     : Will secure org.springframework.security.oauth2.server.authorization.config.annotation.web.configurers.OAuth2AuthorizationServerConfigurer$$Lambda/0x000000e001a2f098@27215154 with filters: DisableEncodeUrlFilter, WebAsyncManagerIntegrationFilter, SecurityContextHolderFilter, AuthorizationServerContextFilter, HeaderWriterFilter, CorsFilter, CsrfFilter, OidcLogoutEndpointFilter, LogoutFilter, OAuth2AuthorizationServerMetadataEndpointFilter, OAuth2AuthorizationEndpointFilter, OAuth2DeviceVerificationEndpointFilter, OidcProviderConfigurationEndpointFilter, NimbusJwkSetEndpointFilter, OAuth2ClientAuthenticationFilter, BearerTokenAuthenticationFilter, AuthenticationFilter, RequestCacheAwareFilter, SecurityContextHolderAwareRequestFilter, AnonymousAuthenticationFilter, ExceptionTranslationFilter, AuthorizationFilter, OAuth2TokenEndpointFilter, OAuth2TokenIntrospectionEndpointFilter, OAuth2TokenRevocationEndpointFilter, OAuth2DeviceAuthorizationEndpointFilter, OidcUserInfoEndpointFilter
+2026-02-22T16:21:49.082+01:00  INFO 280841 --- [           main] o.s.v.b.OptionalValidatorFactoryBean     : Failed to set up a Bean Validation provider: jakarta.validation.NoProviderFoundException: Unable to create a Configuration, because no Jakarta Bean Validation provider could be found. Add a provider like Hibernate Validator (RI) to your classpath.
+2026-02-22T16:21:49.442+01:00  INFO 280841 --- [           main] o.s.b.a.h2.H2ConsoleAutoConfiguration    : H2 console available at '/h2-console'. Database available at 'jdbc:h2:mem:oauth2db'
+2026-02-22T16:21:49.566+01:00  INFO 280841 --- [           main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port 8080 (http) with context path '/'
+2026-02-22T16:21:49.587+01:00  INFO 280841 --- [           main] com.oauth.rest.Application               : Started Application in 11.55 seconds (process running for 12.08)
+🔍 Perfiles activos: [dev]
 Hibernate: 
     select
-        r1_0.user_entity_id,
-        r1_0.roles 
+        count(*) 
     from
-        user_entity_roles r1_0 
-    where
-        r1_0.user_entity_id=?
-Hibernate: 
-    select
-        ue1_0.id,
-        ue1_0.app,
-        ue1_0.created_at,
-        ue1_0.email,
-        ue1_0.full_name,
-        ue1_0.last_password_change_at,
-        ue1_0.password,
-        ue1_0.username 
-    from
-        usuarios ue1_0 
-    where
-        ue1_0.username=?
-Hibernate: 
-    select
-        r1_0.user_entity_id,
-        r1_0.roles 
-    from
-        user_entity_roles r1_0 
-    where
-        r1_0.user_entity_id=?
-dbc.JdbcSQLNonTransientConnectionException: Database may be already in use: "/home/jetson/data/oauth2db.mv.db". Possible solutions: close all other connection(s); use the server mode [90020-232]
-	at org.h2.message.DbException.getJdbcSQLException(DbException.java:690) ~[h2-2.3.232.jar:2.3.232]
-	at org.h2.message.DbException.getJdbcSQLException(DbException.java:489) ~[h2-2.3.232.jar:2.3.232]
-	at org.h2.message.DbException.get(DbException.java:212) ~[h2-2.3.232.jar:2.3.232]
-	at org.h2.mvstore.db.Store.convertMVStoreException(Store.java:165) ~[h2-2.3.232.jar:2.3.232]
-	at org.h2.mvstore.db.Store.<init>(Store.java:142) ~[h2-2.3.232.jar:2.3.232]
-	at org.h2.engine.Database.<init>(Database.java:326) ~[h2-2.3.232.jar:2.3.232]
-	at org.h2.engine.Engine.openSession(Engine.java:92) ~[h2-2.3.232.jar:2.3.232]
-	at org.h2.engine.Engine.openSession(Engine.java:222) ~[h2-2.3.232.jar:2.3.232]
-	at org.h2.engine.Engine.createSession(Engine.java:201) ~[h2-2.3.232.jar:2.3.232]
-	at org.h2.engine.SessionRemote.connectEmbeddedOrServer(SessionRemote.java:344) ~[h2-2.3.232.jar:2.3.232]
-	at org.h2.jdbc.JdbcConnection.<init>(JdbcConnection.java:124) ~[h2-2.3.232.jar:2.3.232]
-	at org.h2.Driver.connect(Driver.java:59) ~[h2-2.3.232.jar:2.3.232]
-	at com.zaxxer.hikari.util.DriverDataSource.getConnection(DriverDataSource.java:144) ~[HikariCP-6.3.3.jar:na]
-	at com.zaxxer.hikari.pool.PoolBase.newConnection(PoolBase.java:370) ~[HikariCP-6.3.3.jar:na]
-	at com.zaxxer.hikari.pool.PoolBase.newPoolEntry(PoolBase.java:207) ~[HikariCP-6.3.3.jar:na]
-	at com.zaxxer.hikari.pool.HikariPool.createPoolEntry(HikariPool.java:488) ~[HikariCP-6.3.3.jar:na]
-	at com.zaxxer.hikari.pool.HikariPool.checkFailFast(HikariPool.java:576) ~[HikariCP-6.3.3.jar:na]
-	at com.zaxxer.hikari.pool.HikariPool.<init>(HikariPool.java:97) ~[HikariCP-6.3.3.jar:na]
-	at com.zaxxer.hikari.HikariDataSource.getConnection(HikariDataSource.java:111) ~[HikariCP-6.3.3.jar:na]
-	at org.hibernate.engine.jdbc.connections.internal.DatasourceConnectionProviderImpl.getConnection(DatasourceConnectionProviderImpl.java:126) ~[hibernate-core-6.6.42.Final.jar:6.6.42.Final]
-	at org.hibernate.engine.jdbc.env.internal.JdbcEnvironmentInitiator$ConnectionProviderJdbcConnectionAccess.obtainConnection(JdbcEnvironmentInitiator.java:485) ~[hibernate-core-6.6.42.Final.jar:6.6.42.Final]
-	at org.hibernate.resource.transaction.backend.jdbc.internal.JdbcIsolationDelegate.delegateWork(JdbcIsolationDelegate.java:61) ~[hibernate-core-6.6.42.Final.jar:6.6.42.Final]
-	... 33 common frames omitted
-Caused by: org.h2.mvstore.MVStoreException: The file is locked: /home/jetson/data/oauth2db.mv.db [2.3.232/7]
-	at org.h2.mvstore.DataUtils.newMVStoreException(DataUtils.java:996) ~[h2-2.3.232.jar:2.3.232]
-	at org.h2.mvstore.SingleFileStore.lockFileChannel(SingleFileStore.java:143) ~[h2-2.3.232.jar:2.3.232]
-	at org.h2.mvstore.SingleFileStore.open(SingleFileStore.java:117) ~[h2-2.3.232.jar:2.3.232]
-	at org.h2.mvstore.SingleFileStore.open(SingleFileStore.java:81) ~[h2-2.3.232.jar:2.3.232]
-	at org.h2.mvstore.MVStore.<init>(MVStore.java:286) ~[h2-2.3.232.jar:2.3.232]
-	at org.h2.mvstore.MVStore$Builder.open(MVStore.java:2035) ~[h2-2.3.232.jar:2.3.232]
-	at org.h2.mvstore.db.Store.<init>(Store.java:133) ~[h2-2.3.232.jar:2.3.232]
-	... 50 common frames omitted
-
-2026-02-21T22:47:58.916+01:00 ERROR 1810339 --- [           main] j.LocalContainerEntityManagerFactoryBean : Failed to initialize JPA EntityManagerFactory: Unable to create requested service [org.hibernate.engine.jdbc.env.spi.JdbcEnvironment] due to: Unable to determine Dialect without JDBC metadata (please set 'jakarta.persistence.jdbc.url' for common cases or 'hibernate.dialect' when a custom Dialect implementation must be provided)
-2026-02-21T22:47:58.917+01:00  WARN 1810339 --- [           main] ConfigServletWebServerApplicationContext : Exception encountered during context initialization - cancelling refresh attempt: org.springframework.beans.factory.BeanCreationException: Error creating bean with name 'entityManagerFactory' defined in class path resource [org/springframework/boot/autoconfigure/orm/jpa/HibernateJpaConfiguration.class]: Unable to create requested service [org.hibernate.engine.jdbc.env.spi.JdbcEnvironment] due to: Unable to determine Dialect without JDBC metadata (please set 'jakarta.persistence.jdbc.url' for common cases or 'hibernate.dialect' when a custom Dialect implementation must be provided)
-2026-02-21T22:47:58.924+01:00  INFO 1810339 --- [           main] o.apache.catalina.core.StandardService   : Stopping service [Tomcat]
-2026-02-21T22:47:58.965+01:00  INFO 1810339 --- [           main] .s.b.a.l.ConditionEvaluationReportLogger : 
-
-Error starting ApplicationContext. To display the condition evaluation report re-run your application with 'debug' enabled.
-2026-02-21T22:47:59.005+01:00 ERROR 1810339 --- [           main] o.s.boot.SpringApplication               : Application run failed
-
-org.springframework.beans.factory.BeanCreationException: Error creating bean with name 'entityManagerFactory' defined in class path resource [org/springframework/boot/autoconfigure/orm/jpa/HibernateJpaConfiguration.class]: Unable to create requested service [org.hibernate.engine.jdbc.env.spi.JdbcEnvironment] due to: Unable to determine Dialect without JDBC metadata (please set 'jakarta.persistence.jdbc.url' for common cases or 'hibernate.dialect' when a custom Dialect implementation must be provided)
-	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.initializeBean(AbstractAutowireCapableBeanFactory.java:1826) ~[spring-beans-6.2.16.jar:6.2.16]
-	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.doCreateBean(AbstractAutowireCapableBeanFactory.java:607) ~[spring-beans-6.2.16.jar:6.2.16]
-	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBean(AbstractAutowireCapableBeanFactory.java:529) ~[spring-beans-6.2.16.jar:6.2.16]
-	at org.springframework.beans.factory.support.AbstractBeanFactory.lambda$doGetBean$0(AbstractBeanFactory.java:339) ~[spring-beans-6.2.16.jar:6.2.16]
-	at org.springframework.beans.factory.support.DefaultSingletonBeanRegistry.getSingleton(DefaultSingletonBeanRegistry.java:373) ~[spring-beans-6.2.16.jar:6.2.16]
-	at org.springframework.beans.factory.support.AbstractBeanFactory.doGetBean(AbstractBeanFactory.java:337) ~[spring-beans-6.2.16.jar:6.2.16]
-	at org.springframework.beans.factory.support.AbstractBeanFactory.getBean(AbstractBeanFactory.java:207) ~[spring-beans-6.2.16.jar:6.2.16]
-	at org.springframework.context.support.AbstractApplicationContext.finishBeanFactoryInitialization(AbstractApplicationContext.java:974) ~[spring-context-6.2.16.jar:6.2.16]
-	at org.springframework.context.support.AbstractApplicationContext.refresh(AbstractApplicationContext.java:628) ~[spring-context-6.2.16.jar:6.2.16]
-	at org.springframework.boot.web.servlet.context.ServletWebServerApplicationContext.refresh(ServletWebServerApplicationContext.java:146) ~[spring-boot-3.5.11.jar:3.5.11]
-	at org.springframework.boot.SpringApplication.refresh(SpringApplication.java:752) ~[spring-boot-3.5.11.jar:3.5.11]
-	at org.springframework.boot.SpringApplication.refreshContext(SpringApplication.java:439) ~[spring-boot-3.5.11.jar:3.5.11]
-	at org.springframework.boot.SpringApplication.run(SpringApplication.java:318) ~[spring-boot-3.5.11.jar:3.5.11]
-	at com.oauth.rest.Application.main(Application.java:13) ~[classes/:na]
-Caused by: org.hibernate.service.spi.ServiceException: Unable to create requested service [org.hibernate.engine.jdbc.env.spi.JdbcEnvironment] due to: Unable to determine Dialect without JDBC metadata (please set 'jakarta.persistence.jdbc.url' for common cases or 'hibernate.dialect' when a custom Dialect implementation must be provided)
-	at org.hibernate.service.internal.AbstractServiceRegistryImpl.createService(AbstractServiceRegistryImpl.java:276) ~[hibernate-core-6.6.42.Final.jar:6.6.42.Final]
-	at org.hibernate.service.internal.AbstractServiceRegistryImpl.initializeService(AbstractServiceRegistryImpl.java:238) ~[hibernate-core-6.6.42.Final.jar:6.6.42.Final]
-	at org.hibernate.service.internal.AbstractServiceRegistryImpl.getService(AbstractServiceRegistryImpl.java:215) ~[hibernate-core-6.6.42.Final.jar:6.6.42.Final]
-	at org.hibernate.boot.model.relational.Database.<init>(Database.java:45) ~[hibernate-core-6.6.42.Final.jar:6.6.42.Final]
-	at org.hibernate.boot.internal.InFlightMetadataCollectorImpl.getDatabase(InFlightMetadataCollectorImpl.java:226) ~[hibernate-core-6.6.42.Final.jar:6.6.42.Final]
-	at org.hibernate.boot.internal.InFlightMetadataCollectorImpl.<init>(InFlightMetadataCollectorImpl.java:194) ~[hibernate-core-6.6.42.Final.jar:6.6.42.Final]
-	at org.hibernate.boot.model.process.spi.MetadataBuildingProcess.complete(MetadataBuildingProcess.java:171) ~[hibernate-core-6.6.42.Final.jar:6.6.42.Final]
-	at org.hibernate.jpa.boot.internal.EntityManagerFactoryBuilderImpl.metadata(EntityManagerFactoryBuilderImpl.java:1442) ~[hibernate-core-6.6.42.Final.jar:6.6.42.Final]
-	at org.hibernate.jpa.boot.internal.EntityManagerFactoryBuilderImpl.build(EntityManagerFactoryBuilderImpl.java:1513) ~[hibernate-core-6.6.42.Final.jar:6.6.42.Final]
-	at org.springframework.orm.jpa.vendor.SpringHibernateJpaPersistenceProvider.createContainerEntityManagerFactory(SpringHibernateJpaPersistenceProvider.java:66) ~[spring-orm-6.2.16.jar:6.2.16]
-	at org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean.createNativeEntityManagerFactory(LocalContainerEntityManagerFactoryBean.java:388) ~[spring-orm-6.2.16.jar:6.2.16]
-	at org.springframework.orm.jpa.AbstractEntityManagerFactoryBean.buildNativeEntityManagerFactory(AbstractEntityManagerFactoryBean.java:419) ~[spring-orm-6.2.16.jar:6.2.16]
-	at org.springframework.orm.jpa.AbstractEntityManagerFactoryBean.afterPropertiesSet(AbstractEntityManagerFactoryBean.java:400) ~[spring-orm-6.2.16.jar:6.2.16]
-	at org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean.afterPropertiesSet(LocalContainerEntityManagerFactoryBean.java:364) ~[spring-orm-6.2.16.jar:6.2.16]
-	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.invokeInitMethods(AbstractAutowireCapableBeanFactory.java:1873) ~[spring-beans-6.2.16.jar:6.2.16]
-	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.initializeBean(AbstractAutowireCapableBeanFactory.java:1822) ~[spring-beans-6.2.16.jar:6.2.16]
-	... 13 common frames omitted
-Caused by: org.hibernate.HibernateException: Unable to determine Dialect without JDBC metadata (please set 'jakarta.persistence.jdbc.url' for common cases or 'hibernate.dialect' when a custom Dialect implementation must be provided)
-	at org.hibernate.engine.jdbc.dialect.internal.DialectFactoryImpl.determineDialect(DialectFactoryImpl.java:191) ~[hibernate-core-6.6.42.Final.jar:6.6.42.Final]
-	at org.hibernate.engine.jdbc.dialect.internal.DialectFactoryImpl.buildDialect(DialectFactoryImpl.java:87) ~[hibernate-core-6.6.42.Final.jar:6.6.42.Final]
-	at org.hibernate.engine.jdbc.env.internal.JdbcEnvironmentInitiator.getJdbcEnvironmentWithDefaults(JdbcEnvironmentInitiator.java:186) ~[hibernate-core-6.6.42.Final.jar:6.6.42.Final]
-	at org.hibernate.engine.jdbc.env.internal.JdbcEnvironmentInitiator.getJdbcEnvironmentUsingJdbcMetadata(JdbcEnvironmentInitiator.java:410) ~[hibernate-core-6.6.42.Final.jar:6.6.42.Final]
-	at org.hibernate.engine.jdbc.env.internal.JdbcEnvironmentInitiator.initiateService(JdbcEnvironmentInitiator.java:129) ~[hibernate-core-6.6.42.Final.jar:6.6.42.Final]
-	at org.hibernate.engine.jdbc.env.internal.JdbcEnvironmentInitiator.initiateService(JdbcEnvironmentInitiator.java:81) ~[hibernate-core-6.6.42.Final.jar:6.6.42.Final]
-	at org.hibernate.boot.registry.internal.StandardServiceRegistryImpl.initiateService(StandardServiceRegistryImpl.java:130) ~[hibernate-core-6.6.42.Final.jar:6.6.42.Final]
-	at org.hibernate.service.internal.AbstractServiceRegistryImpl.createService(AbstractServiceRegistryImpl.java:263) ~[hibernate-core-6.6.42.Final.jar:6.6.42.Final]
-	... 28 common frames omitted
-
+        usuarios ue1_0
+ℹ️  Usuarios ya existentes en la base de datos
+✅ Perfiles activos: dev
+✅ URL H2: jdbc:h2:mem:oauth2db;DB_CLOSE_DELAY=-1;MODE=PostgreSQL
+✅ Driver: org.h2.Driver
+✅ Puerto: 8080
+2026-02-22T16:22:03.299+01:00  INFO 280841 --- [nio-8080-exec-1] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring DispatcherServlet 'dispatcherServlet'
+2026-02-22T16:22:03.300+01:00  INFO 280841 --- [nio-8080-exec-1] o.s.web.servlet.DispatcherServlet        : Initializing Servlet 'dispatcherServlet'
+2026-02-22T16:22:03.303+01:00  INFO 280841 --- [nio-8080-exec-1] o.s.web.servlet.DispatcherServlet        : Completed initialization in 2 ms
+2026-02-22T16:22:03.336+01:00 DEBUG 280841 --- [nio-8080-exec-1] o.s.security.web.FilterChainProxy        : Securing GET /login
+2026-02-22T16:22:03.353+01:00 DEBUG 280841 --- [nio-8080-exec-1] o.s.security.web.FilterChainProxy        : Secured GET /login
+2026-02-22T16:22:03.903+01:00 DEBUG 280841 --- [nio-8080-exec-1] o.s.s.w.a.AnonymousAuthenticationFilter  : Set SecurityContextHolder to anonymous SecurityContext
+2026-02-22T16:22:14.879+01:00 DEBUG 280841 --- [nio-8080-exec-2] o.s.security.web.FilterChainProxy        : Securing GET /oauth2/authorize?response_type=code&client_id=proveedor-oauth&redirect_uri=http://localhost:3000/callback&scope=openid%20profile%20read%20write&code_challenge=&code_challenge_method=S256
+2026-02-22T16:22:14.920+01:00 DEBUG 280841 --- [nio-8080-exec-2] o.s.s.authentication.ProviderManager     : Authentication failed with provider OAuth2AuthorizationCodeRequestAuthenticationProvider since OAuth 2.0 Parameter: code_challenge
+2026-02-22T16:22:14.929+01:00 DEBUG 280841 --- [nio-8080-exec-2] .s.a.DefaultAuthenticationEventPublisher : No event was found for the exception org.springframework.security.oauth2.server.authorization.authentication.OAuth2AuthorizationCodeRequestAuthenticationException
+2026-02-22T16:22:14.929+01:00 DEBUG 280841 --- [nio-8080-exec-2] o.s.s.authentication.ProviderManager     : Denying authentication since all attempted providers failed
+2026-02-22T16:22:14.934+01:00 DEBUG 280841 --- [nio-8080-exec-2] o.s.s.web.DefaultRedirectStrategy        : Redirecting to http://localhost:3000/callback?error=invalid_request&error_description=OAuth%202.0%20Parameter%3A%20code_challenge&error_uri=https%3A%2F%2Fdatatracker.ietf.org%2Fdoc%2Fhtml%2Frfc7636%23section-4.4.1
+2026-02-22T16:22:26.799+01:00 DEBUG 280841 --- [nio-8080-exec-4] o.s.security.web.FilterChainProxy        : Securing GET /oauth2/authorize?response_type=code&client_id=proveedor-oauth&redirect_uri=http://localhost:3000/callback&scope=openid%20profile%20read%20write&code_challenge=E9Melhoa2OwvFrEMTJguCHaoeK1t8URWbuGJSstw-cM&code_challenge_method=S256
+2026-02-22T16:22:26.804+01:00 DEBUG 280841 --- [nio-8080-exec-4] o.s.s.w.a.AnonymousAuthenticationFilter  : Set SecurityContextHolder to anonymous SecurityContext
+2026-02-22T16:22:26.828+01:00 DEBUG 280841 --- [nio-8080-exec-4] o.s.s.w.s.HttpSessionRequestCache        : Saved request http://localhost:8080/oauth2/authorize?response_type=code&client_id=proveedor-oauth&redirect_uri=http://localhost:3000/callback&scope=openid%20profile%20read%20write&code_challenge=E9Melhoa2OwvFrEMTJguCHaoeK1t8URWbuGJSstw-cM&code_challenge_method=S256&continue to session
+2026-02-22T16:22:26.829+01:00 DEBUG 280841 --- [nio-8080-exec-4] o.s.s.web.DefaultRedirectStrategy        : Redirecting to http://localhost:8080/login
+2026-02-22T16:22:51.646+01:00 DEBUG 280841 --- [nio-8080-exec-6] o.s.security.web.FilterChainProxy        : Securing POST /oauth2/token
+2026-02-22T16:22:51.855+01:00 DEBUG 280841 --- [nio-8080-exec-6] o.s.s.authentication.ProviderManager     : Authentication failed with provider ClientSecretAuthenticationProvider since Client authentication failed: code
+2026-02-22T16:22:51.857+01:00 DEBUG 280841 --- [nio-8080-exec-6] .s.a.DefaultAuthenticationEventPublisher : No event was found for the exception org.springframework.security.oauth2.core.OAuth2AuthenticationException
+2026-02-22T16:22:51.857+01:00 DEBUG 280841 --- [nio-8080-exec-6] o.s.s.authentication.ProviderManager     : Denying authentication since all attempted providers failed
 [[1;34mINFO[m] [1m------------------------------------------------------------------------[m
 [[1;34mINFO[m] [1;31mBUILD FAILURE[m
 [[1;34mINFO[m] [1m------------------------------------------------------------------------[m
-[[1;34mINFO[m] Total time:  11.399 s
-[[1;34mINFO[m] Finished at: 2026-02-21T22:47:59+01:00
+[[1;34mINFO[m] Total time:  05:31 min
+[[1;34mINFO[m] Finished at: 2026-02-22T16:27:06+01:00
 [[1;34mINFO[m] [1m------------------------------------------------------------------------[m
-[[1;31mERROR[m] Failed to execute goal [32morg.springframework.boot:spring-boot-maven-plugin:3.5.11:run[m [1m(default-cli)[m on project [36mOAuth2Server[m: [1;31mProcess terminated with exit code: 1[m -> [1m[Help 1][m
+[[1;31mERROR[m] Failed to execute goal [32morg.springframework.boot:spring-boot-maven-plugin:3.5.11:run[m [1m(default-cli)[m on project [36mOAuth2Server[m: [1;31mProcess terminated with exit code: 137[m -> [1m[Help 1][m
 [[1;31mERROR[m] 
 [[1;31mERROR[m] To see the full stack trace of the errors, re-run Maven with the [1m-e[m switch.
 [[1;31mERROR[m] Re-run Maven using the [1m-X[m switch to enable full debug logging.
