@@ -87,7 +87,6 @@ OAuth2Server/
     ├── application.properties
     ├── application-dev.properties
     ├── application-prod.properties
-    ├── data.sql
     └── db/migration/
 ```
 
@@ -195,10 +194,6 @@ Las credenciales del cliente OAuth2 y usuario se configuran en el archivo `.env`
 # Cliente OAuth2
 OAUTH_CLIENT_ID=proveedor-oauth
 OAUTH_CLIENT_SECRET=123456
-
-# Usuario por defecto
-DEFAULT_ADMIN_USERNAME=admin
-DEFAULT_ADMIN_PASSWORD=Admin1
 ```
 
 ---
