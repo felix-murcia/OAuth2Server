@@ -74,6 +74,14 @@ OAuth2Server/
 │   ├── model/
 │   ├── repository/
 │   ├── security/
+│   │   ├── RequestCacheConfig.java    # Configuración de RequestCache
+│   │   ├── SecurityConfig.java        # Configuración de seguridad
+│   │   ├── AppAwareAuthenticationProvider.java
+│   │   ├── PasswordEncoderConfig.java
+│   │   └── oauth2/
+│   │       ├── OAuth2AuthorizationServer.java
+│   │       ├── OAuth2SavedRequestAwareAuthSuccessHandler.java
+│   │       └── ...
 │   └── service/
 └── src/main/resources/
     ├── application.properties

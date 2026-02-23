@@ -413,6 +413,14 @@ Requiere autenticación con rol ADMIN.
 
 ## Solución de Problemas
 
+### Error: "The dependencies of some of the beans form a cycle"
+
+Este error indica una dependencia circular entre beans de Spring. Para resolverlo:
+
+1. Verifica que el bean `RequestCache` esté definido en una clase de configuración separada (`RequestCacheConfig.java`)
+2. Asegúrate de que `SecurityConfig` no defina el bean `RequestCache` directamente
+3. Ejecuta `mvn clean install` para recompilar
+
 ### Error: "Port 8080 already in use"
 
 ```bash
@@ -466,6 +474,14 @@ OAuth2Server/
 │   │   ├── model/         # Entidades
 │   │   ├── repository/    # Repositorios JPA
 │   │   ├── security/      # Seguridad
+│   │   │   ├── RequestCacheConfig.java      # Bean RequestCache
+│   │   │   ├── SecurityConfig.java          # Configuración principal
+│   │   │   ├── AppAwareAuthenticationProvider.java
+│   │   │   ├── PasswordEncoderConfig.java
+│   │   │   └── oauth2/    # Componentes OAuth2
+│   │   │       ├── OAuth2AuthorizationServer.java
+│   │   │       ├── OAuth2SavedRequestAwareAuthSuccessHandler.java
+│   │   │       └── ...
 │   │   └── service/       # Servicios
 │   └── resources/
 │       ├── application-*.properties
