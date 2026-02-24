@@ -15,10 +15,10 @@ spec:
     spec:
       containers:
         - name: oauth2-server
-          image: felixmurcia/oauth2server:v20260223-1533
+          image: felixmurcia/oauth2server:v20260223-2201
           
-          # Ejecuta tu script de producción dentro del contenedor
-          command: ["/bin/sh", "-c", "/app/run-prod.sh"]
+          command: ["java"]
+          args: ["-jar", "/app/app.jar", "--spring.profiles.active=prod"]
 
           env:
             - name: SPRING_PROFILES_ACTIVE
@@ -87,25 +87,25 @@ spec:
             - name: CINE_PLATFORM_SECRET
               valueFrom:
                 secretKeyRef:
-                  name: cine-secret
+                  name: oauth2-secrets
                   key: CINE_PLATFORM_SECRET
 
             - name: CINE_PLATFORM_REDIRECT_URI
               valueFrom:
                 secretKeyRef:
-                  name: cine-secret
+                  name: oauth2-secrets
                   key: CINE_PLATFORM_REDIRECT_URI
-				  
+
             - name: TRANSCRIBEAPP_SECRET
               valueFrom:
                 secretKeyRef:
-                  name: cine-secret
+                  name: oauth2-secrets
                   key: TRANSCRIBEAPP_SECRET
 
             - name: TRANSCRIBEAPP_REDIRECT_URI
               valueFrom:
                 secretKeyRef:
-                  name: cine-secret
+                  name: oauth2-secrets
                   key: TRANSCRIBEAPP_REDIRECT_URI	
 
           ports:

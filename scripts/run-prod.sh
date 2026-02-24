@@ -1,14 +1,8 @@
-#!/usr/bin/env bash
+#!/bin/sh
 
 echo "=== Arrancando OAuth2Server en modo PRODUCCIÓN ==="
-
-# Comprobación básica: ¿hay clave JWT?
-if [ -z "$JWT_SIGNING_KEY" ]; then
-  echo "ERROR: La variable JWT_SIGNING_KEY no está definida."
-  exit 1
-fi
+echo "JWT_SIGNING_KEY está definida: $(if [ -n \"$JWT_SIGNING_KEY\" ]; then echo \"SÍ\"; else echo \"NO\"; fi)"
 
 export SPRING_PROFILES_ACTIVE=prod
 
-# ARRANQUE CORRECTO (sin redirección a /data)
-java -jar /app/app.jar
+exec java -jar /app/app.jar

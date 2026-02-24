@@ -1,10 +1,12 @@
 FROM eclipse-temurin:21-jdk-alpine
 
+RUN apk add --no-cache bash
+
 # Directorio de trabajo dentro del contenedor
 WORKDIR /app
 
 # Copiamos el JAR ya compilado
-COPY target/OAuth2Server-0.0.1-SNAPSHOT.jar /app/app.jar
+COPY target/oauth2server-0.0.1-SNAPSHOT.jar /app/app.jar
 
 # Copiamos los scripts desde tu repo local
 COPY scripts/run-dev.sh /app/run-dev.sh

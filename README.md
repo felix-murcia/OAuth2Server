@@ -137,10 +137,10 @@ OAuth2Server/
 mvn clean package
 
 # Ejecutar (perfil dev por defecto)
-java -jar target/OAuth2Server-0.0.1-SNAPSHOT.jar
+java -jar target/oauth2server-0.0.1-SNAPSHOT.jar
 
 # Con perfil específico
-java -jar target/OAuth2Server-0.0.1-SNAPSHOT.jar --spring.profiles.active=dev
+java -jar target/oauth2server-0.0.1-SNAPSHOT.jar --spring.profiles.active=dev
 ```
 
 ### Con Spring Boot plugin

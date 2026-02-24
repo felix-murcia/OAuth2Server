@@ -233,7 +233,7 @@ sudo k3s ctr images import oauth2-server.tar
 
 ```bash
 mvn clean package
-java -jar target/OAuth2Server-0.0.1-SNAPSHOT.jar
+java -jar target/oauth2server-0.0.1-SNAPSHOT.jar
 ```
 
 ### Comprobar puerto en uso

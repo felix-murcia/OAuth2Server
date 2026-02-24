@@ -13,7 +13,7 @@
     </parent>
 
     <groupId>com.oauth.rest</groupId>
-    <artifactId>OAuth2Server</artifactId>
+    <artifactId>oauth2server</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <name>OAuth2Server</name>
     <description>Implementación de la seguridad OAuth2 en API REST</description>
@@ -266,4 +266,11 @@
         </plugins>
     </build>
 
+    <distributionManagement>
+    <repository>
+        <id>github</id>
+        <name>GitHub OWNER Apache Maven Packages</name>
+        <url>https://maven.pkg.github.com/FelixMarin/OAuth2Server</url>
+    </repository>
+    </distributionManagement>
 </project>

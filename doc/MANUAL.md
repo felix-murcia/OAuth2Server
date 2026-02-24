@@ -71,7 +71,7 @@ mvn spring-boot:run
 mvn clean package -DskipTests
 
 # Ejecutar el JAR
-java -jar target/OAuth2Server-0.0.1-SNAPSHOT.jar
+java -jar target/oauth2server-0.0.1-SNAPSHOT.jar
 ```
 
 El servidor se ejecutará en: **http://localhost:8080**

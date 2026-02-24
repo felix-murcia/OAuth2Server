@@ -45,7 +45,7 @@ jobs:
       - name: Verify application starts
         run: |
           # Start the application in the background
-          java -jar target/OAuth2Server-0.0.1-SNAPSHOT.jar &
+          java -jar target/oauth2server-0.0.1-SNAPSHOT.jar &
           APP_PID=$!
           
           # Wait for the application to start (max 60 seconds)
