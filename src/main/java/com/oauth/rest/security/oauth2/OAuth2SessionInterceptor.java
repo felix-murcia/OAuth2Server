@@ -6,8 +6,6 @@ import jakarta.servlet.http.HttpSession;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
 
-import com.oauth.rest.security.oauth2.OAuth2AuthenticationSuccessHandler;
-
 /**
  * Interceptor que almacena los parámetros OAuth2 en la sesión antes de
  * redirigir a /login.

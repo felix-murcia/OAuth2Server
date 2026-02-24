@@ -5,6 +5,7 @@ import com.nimbusds.jose.jwk.RSAKey;
 import com.nimbusds.jose.jwk.source.ImmutableJWKSet;
 import com.nimbusds.jose.jwk.source.JWKSource;
 import com.nimbusds.jose.proc.SecurityContext;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -37,6 +38,7 @@ import java.util.List;
 import java.util.UUID;
 
 @Configuration
+@Slf4j
 public class OAuth2AuthorizationServer {
 
         @Value("${oauth2.access-token-validity-seconds}")
@@ -80,14 +82,12 @@ public class OAuth2AuthorizationServer {
         public RegisteredClientRepository registeredClientRepository(PasswordEncoder passwordEncoder) {
                 List<RegisteredClient> clients = new ArrayList<>();
 
-                System.out.println("=== DIAGNÓSTICO CLIENT PROPERTIES ===");
-                System.out.println("clientProperties es null? " + (clientProperties == null));
+                log.debug("=== DIAGNÓSTICO CLIENT PROPERTIES ===");
+                log.debug("clientProperties es null? {}", clientProperties == null);
                 if (clientProperties != null) {
-                        System.out.println("clientProperties.getClients() es null? "
-                                        + (clientProperties.getClients() == null));
+                        log.debug("clientProperties.getClients() es null? {}", clientProperties.getClients() == null);
                         if (clientProperties.getClients() != null) {
-                                System.out.println("Número de clientes en properties: "
-                                                + clientProperties.getClients().size());
+                                log.debug("Número de clientes en properties: {}", clientProperties.getClients().size());
                         }
                 }
                 // Si hay clientes configurados en properties, usarlos

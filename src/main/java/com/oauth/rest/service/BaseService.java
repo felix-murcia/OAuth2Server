@@ -6,7 +6,7 @@ import java.util.Optional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.lang.NonNull;
+import lombok.NonNull;
 import org.springframework.transaction.annotation.Transactional;
 
 public abstract class BaseService<T, ID, R extends JpaRepository<T, ID>> {

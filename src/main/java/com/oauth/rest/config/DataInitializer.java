@@ -3,6 +3,7 @@ package com.oauth.rest.config;
 import com.oauth.rest.model.UserEntity;
 import com.oauth.rest.model.UserRole;
 import com.oauth.rest.repository.UserEntityRepository;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
@@ -18,6 +19,7 @@ import java.util.Set;
 @Configuration
 @Profile("!test") // No ejecutar en tests
 @PropertySource(value = "classpath:application-secrets.properties", ignoreResourceNotFound = true)
+@Slf4j
 public class DataInitializer {
 
     // Variables de entorno (prioridad 1)
@@ -57,7 +59,7 @@ public class DataInitializer {
     public CommandLineRunner initUsers(UserEntityRepository userRepository) {
         return args -> {
             // Log para depuración - mostrar perfiles activos
-            System.out.println("🔍 Perfiles activos: " + Arrays.toString(environment.getActiveProfiles()));
+            log.info("Perfiles activos: {}", Arrays.toString(environment.getActiveProfiles()));
 
             if (userRepository.count() == 0) {
 
@@ -65,16 +67,16 @@ public class DataInitializer {
                 if (adminPassword == null || adminPassword.trim().isEmpty() ||
                         userPassword == null || userPassword.trim().isEmpty()) {
 
-                    System.err.println("⚠️  ADVERTENCIA: Contraseñas no configuradas");
-                    System.err.println("   Usando valores por defecto SOLO PARA DESARROLLO");
+                    log.warn("ADVERTENCIA: Contraseñas no configuradas");
+                    log.warn("Usando valores por defecto SOLO PARA DESARROLLO");
 
                     // En desarrollo, podemos generar contraseñas aleatorias
                     if (environment.matchesProfiles("dev")) {
                         adminPassword = "admin" + System.currentTimeMillis();
                         userPassword = "user" + System.currentTimeMillis();
-                        System.out.println("🔐 Credenciales generadas para desarrollo:");
-                        System.out.println("   admin / " + adminPassword);
-                        System.out.println("   user1 / " + userPassword);
+                        log.info("Credenciales generadas para desarrollo:");
+                        log.info("   admin / {}", adminPassword);
+                        log.info("   user1 / {}", userPassword);
                     } else {
                         throw new IllegalStateException(
                                 "Las contraseñas no están configuradas. " +
@@ -104,11 +106,11 @@ public class DataInitializer {
                 user.setRoles(Set.of(UserRole.USER));
                 userRepository.save(user);
 
-                System.out.println("✅ Usuarios inicializados correctamente");
-                System.out.println("   - Admin: " + adminUsername);
-                System.out.println("   - User: " + userUsername);
+                log.info("Usuarios inicializados correctamente");
+                log.info("   - Admin: {}", adminUsername);
+                log.info("   - User: {}", userUsername);
             } else {
-                System.out.println("ℹ️  Usuarios ya existentes en la base de datos");
+                log.info("Usuarios ya existentes en la base de datos");
             }
         };
     }

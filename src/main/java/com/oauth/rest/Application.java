@@ -1,5 +1,7 @@
 package com.oauth.rest;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -10,12 +12,14 @@ import com.oauth.rest.security.oauth2.OAuth2ClientProperties;
 @EnableConfigurationProperties(OAuth2ClientProperties.class)
 public class Application {
 
+	private static final Logger log = LoggerFactory.getLogger(Application.class);
+
 	public static void main(String[] args) {
 		SpringApplication app = new SpringApplication(Application.class);
 
 		Environment env = app.run(args).getEnvironment();
 
 		// Verificar configuración (solo para depuración)
-		System.out.println("✅ Perfiles activos: " + String.join(", ", env.getActiveProfiles()));
+		log.info("Perfiles activos: {}", String.join(", ", env.getActiveProfiles()));
 	}
 }

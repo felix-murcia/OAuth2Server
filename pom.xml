@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
 
     <modelVersion>4.0.0</modelVersion>
 
@@ -9,7 +9,7 @@
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
         <version>3.5.11</version>
-        <relativePath/>
+        <relativePath />
     </parent>
 
     <groupId>com.oauth.rest</groupId>
@@ -143,6 +143,38 @@
     </dependencies>
 
     <build>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.eclipse.m2e</groupId>
+                    <artifactId>lifecycle-mapping</artifactId>
+                    <version>1.0.0</version>
+                    <configuration>
+                        <lifecycleMappingMetadata>
+                            <pluginExecutions>
+                                <pluginExecution>
+                                    <pluginExecutionFilter>
+                                        <groupId>org.codehaus.gmavenplus</groupId>
+                                        <artifactId>gmavenplus-plugin</artifactId>
+                                        <versionRange>[3.0.2,)</versionRange>
+                                        <goals>
+                                            <goal>addSources</goal>
+                                            <goal>addTestSources</goal>
+                                            <goal>compile</goal>
+                                            <goal>compileTests</goal>
+                                        </goals>
+                                    </pluginExecutionFilter>
+                                    <action>
+                                        <ignore />
+                                    </action>
+                                </pluginExecution>
+                            </pluginExecutions>
+                        </lifecycleMappingMetadata>
+                    </configuration>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+
         <plugins>
 
             <!-- Plugin de Spring Boot -->
@@ -194,7 +226,9 @@
                 <executions>
                     <execution>
                         <goals>
+                            <goal>addSources</goal>
                             <goal>addTestSources</goal>
+                            <goal>compile</goal>
                             <goal>compileTests</goal>
                         </goals>
                     </execution>
@@ -267,10 +301,10 @@
     </build>
 
     <distributionManagement>
-    <repository>
-        <id>github</id>
-        <name>GitHub OWNER Apache Maven Packages</name>
-        <url>https://maven.pkg.github.com/FelixMarin/OAuth2Server</url>
-    </repository>
+        <repository>
+            <id>github</id>
+            <name>GitHub OWNER Apache Maven Packages</name>
+            <url>https://maven.pkg.github.com/FelixMarin/OAuth2Server</url>
+        </repository>
     </distributionManagement>
 </project>

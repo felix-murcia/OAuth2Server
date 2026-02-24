@@ -63,11 +63,6 @@ public class OAuth2SavedRequestAwareAuthSuccessHandler extends SavedRequestAware
             state = savedRequest.getParameterValues("state") != null
                     ? savedRequest.getParameterValues("state")[0]
                     : null;
-
-            logger.info("    Retrieved from saved request:");
-            logger.info("        redirect_uri: {}", redirectUri);
-            logger.info("        client_id: {}", clientId);
-            logger.info("        state: {}", state);
         }
 
         // Also try to read from cookies as fallback
@@ -75,10 +70,6 @@ public class OAuth2SavedRequestAwareAuthSuccessHandler extends SavedRequestAware
             redirectUri = getCookieValue(request, "OAUTH2_REDIRECT_URI");
             clientId = getCookieValue(request, "OAUTH2_CLIENT_ID");
             state = getCookieValue(request, "OAUTH2_STATE");
-            logger.info("    Retrieved from cookies (fallback):");
-            logger.info("        redirect_uri: {}", redirectUri);
-            logger.info("        client_id: {}", clientId);
-            logger.info("        state: {}", state);
         }
 
         if (redirectUri != null && clientId != null) {
@@ -87,7 +78,6 @@ public class OAuth2SavedRequestAwareAuthSuccessHandler extends SavedRequestAware
             if (registeredClient != null) {
                 // Generar código de autorización
                 String authorizationCode = generateAuthorizationCode();
-                logger.info("        Generated authorization code: {}", authorizationCode);
 
                 // Guardar el código en una cookie
                 addCookie(response, "OAUTH2_AUTH_CODE", authorizationCode);
@@ -102,7 +92,6 @@ public class OAuth2SavedRequestAwareAuthSuccessHandler extends SavedRequestAware
                 }
 
                 String finalRedirectUrl = redirectUrl.toString();
-                logger.info("    Redirecting to: {}", finalRedirectUrl);
 
                 // Limpiar cookies
                 clearCookie(response, "OAUTH2_REDIRECT_URI");

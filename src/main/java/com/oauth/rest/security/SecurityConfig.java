@@ -22,7 +22,9 @@ import com.oauth.rest.service.CustomUserDetailsService;
 @EnableWebSecurity
 public class SecurityConfig {
 
+        @SuppressWarnings("unused")
         private final PasswordEncoder passwordEncoder;
+        @SuppressWarnings("unused")
         private final CustomUserDetailsService customUserDetailsService;
         private final AppAwareAuthenticationProvider appAwareAuthenticationProvider;
         private final OAuth2ParameterSavingFilter oauth2ParameterSavingFilter;
