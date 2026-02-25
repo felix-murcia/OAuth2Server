@@ -10,7 +10,6 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.firewall.StrictHttpFirewall;
 
@@ -45,44 +44,75 @@ public class SecurityConfig {
         @Bean
         public StrictHttpFirewall httpFirewall() {
                 StrictHttpFirewall firewall = new StrictHttpFirewall();
-                firewall.setAllowSemicolon(true); // Permitir ; en URLs para OAuth2 con jsessionid
+                firewall.setAllowSemicolon(true);
                 firewall.setAllowUrlEncodedPercent(true);
                 return firewall;
         }
 
         @Bean
+        public AuthenticationManager authenticationManager() {
+                return new ProviderManager(appAwareAuthenticationProvider);
+        }
+
+        // PRIMERO: Rutas públicas (login controller, estáticas, error)
+        @Bean
+        @Order(1)
+        public SecurityFilterChain publicFilterChain(HttpSecurity http) throws Exception {
+                http.securityMatcher(
+                                "/login",
+                                "/css/**", "/js/**", "/images/**", "/webjars/**", "/h2-console/**",
+                                "/favicon.ico",
+                                "/error")
+                                .authorizeHttpRequests(authz -> authz.anyRequest().permitAll())
+                                .headers(headers -> headers.frameOptions(frame -> frame.disable()))
+                                .csrf(csrf -> csrf.disable());
+
+                return http.build();
+        }
+
+        // SEGUNDO: Endpoints OAuth2 (con el filtro especial)
+        @Bean
         @Order(2)
-        public SecurityFilterChain defaultSecurityFilterChain(HttpSecurity http) throws Exception {
-                http
-                                // Filtro para guardar parámetros OAuth2 en sesión ANTES de que Spring Security
-                                // intercepte
+        public SecurityFilterChain oauthFilterChain(HttpSecurity http) throws Exception {
+                http.securityMatcher("/oauth2/**", "/oauth/**")
                                 .addFilterBefore(oauth2ParameterSavingFilter,
                                                 UsernamePasswordAuthenticationFilter.class)
-                                // ✅ Esta cadena manejará el resto de peticiones
-                                .securityMatcher("/**")
-                                .authorizeHttpRequests(authorize -> authorize
+                                .authorizeHttpRequests(authz -> authz
                                                 .requestMatchers("/oauth2/authorize", "/oauth/authorize").permitAll()
-                                                .requestMatchers("/oauth/token", "/oauth2/token", "/login",
-                                                                "/h2-console/**")
-                                                .permitAll()
+                                                .requestMatchers("/oauth/token", "/oauth2/token").permitAll()
+                                                .anyRequest().authenticated())
+                                .csrf(csrf -> csrf
+                                                .ignoringRequestMatchers("/oauth/token", "/oauth2/token"));
+
+                return http.build();
+        }
+
+        // TERCERO: Todo lo demás requiere autenticación (form login para cuando
+        // necesita auth)
+        @Bean
+        @Order(3)
+        public SecurityFilterChain defaultFilterChain(HttpSecurity http) throws Exception {
+                http.securityMatcher(
+                                "/",
+                                "/api/**",
+                                "/user/**")
+                                .authorizeHttpRequests(authz -> authz
                                                 .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                                                 .anyRequest().authenticated())
                                 .formLogin(form -> form
                                                 .loginPage("/login")
-                                                .successHandler(oauth2AuthSuccessHandler)
+                                                .loginProcessingUrl("/login")
+                                                .defaultSuccessUrl("/oauth2/authorize", true)
+                                                .failureUrl("/login?error=true")
                                                 .permitAll())
-                                .authenticationManager(authenticationManager())
-                                .exceptionHandling(ex -> ex
-                                                .authenticationEntryPoint(
-                                                                new LoginUrlAuthenticationEntryPoint("/login")))
-                                .csrf(csrf -> csrf
-                                                .ignoringRequestMatchers("/h2-console/**", "/oauth/token",
-                                                                "/oauth2/token"));
-                return http.build();
-        }
+                                .logout(logout -> logout
+                                                .logoutSuccessUrl("/login?logout=true")
+                                                .permitAll())
+                                .sessionManagement(session -> session
+                                                .sessionFixation().migrateSession()
+                                                .invalidSessionUrl("/login"))
+                                .csrf(csrf -> csrf.disable());
 
-        @Bean
-        public AuthenticationManager authenticationManager() {
-                return new ProviderManager(appAwareAuthenticationProvider);
+                return http.build();
         }
 }
