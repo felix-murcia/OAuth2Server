@@ -16,13 +16,13 @@ services:
       PORT: ${PORT:-8080}
       
       # Usuarios iniciales
-      DEFAULT_ADMIN_USERNAME: ${DEFAULT_ADMIN_USERNAME:-admin}
-      DEFAULT_ADMIN_PASSWORD: ${DEFAULT_ADMIN_PASSWORD:-Admin1}
+      DEFAULT_ADMIN_USERNAME: ${DEFAULT_ADMIN_USERNAME}
+      DEFAULT_ADMIN_PASSWORD: ${DEFAULT_ADMIN_PASSWORD}
       
       # OAuth2 Client
-      OAUTH_CLIENT_ID: ${OAUTH_CLIENT_ID:-default-client}
-      OAUTH_CLIENT_SECRET: ${OAUTH_CLIENT_SECRET:-123456}
-      OAUTH_REDIRECT_URI: ${OAUTH_REDIRECT_URI:-http://localhost:8080/login.html}
+      OAUTH_CLIENT_ID: ${OAUTH_CLIENT_ID}
+      OAUTH_CLIENT_SECRET: ${OAUTH_CLIENT_SECRET}
+      OAUTH_REDIRECT_URI: ${OAUTH_REDIRECT_URI}
       
       # Token validity
       ACCESS_TOKEN_VALIDITY: ${ACCESS_TOKEN_VALIDITY:-86400}
@@ -33,7 +33,7 @@ services:
       JWT_AUDIENCE: ${JWT_AUDIENCE:-oauth2-client}
       
       # Clave JWT (importante para producción)
-      JWT_SIGNING_KEY: ${JWT_SIGNING_KEY:-clave-secreta-jwt-para-desarrollo-cambiar-en-produccion}
+      JWT_SIGNING_KEY: ${JWT_SIGNING_KEY}
       
     volumes:
       - /home/jetson/oauth2db:/app/data

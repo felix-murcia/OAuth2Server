@@ -15,6 +15,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 
 /**
  * AuthenticationSuccessHandler que restaura los parámetros OAuth2 desde cookies
@@ -31,19 +32,64 @@ public class OAuth2AuthenticationSuccessHandler implements AuthenticationSuccess
 
         log.info("[OAuth2AuthenticationSuccessHandler] Login exitoso para usuario: {}", authentication.getName());
 
-        // Leer parámetros OAuth2 desde cookies
-        String redirectUri = getCookieValue(request, "OAUTH2_REDIRECT_URI");
-        String clientId = getCookieValue(request, "OAUTH2_CLIENT_ID");
-        String state = getCookieValue(request, "OAUTH2_STATE");
-        String scope = getCookieValue(request, "OAUTH2_SCOPE");
-        String responseType = getCookieValue(request, "OAUTH2_RESPONSE_TYPE");
-        String codeChallenge = getCookieValue(request, "OAUTH2_CODE_CHALLENGE");
-        String codeChallengeMethod = getCookieValue(request, "OAUTH2_CODE_CHALLENGE_METHOD");
+        // Intentar obtener parámetros de la sesión primero (más seguro entre dominios)
+        HttpSession session = request.getSession(false);
+        String redirectUri = null;
+        String clientId = null;
+        String state = null;
+        String scope = null;
+        String responseType = null;
+        String codeChallenge = null;
+        String codeChallengeMethod = null;
+
+        if (session != null) {
+            redirectUri = (String) session.getAttribute("OAUTH2_REDIRECT_URI");
+            clientId = (String) session.getAttribute("OAUTH2_CLIENT_ID");
+            state = (String) session.getAttribute("OAUTH2_STATE");
+            scope = (String) session.getAttribute("OAUTH2_SCOPE");
+            responseType = (String) session.getAttribute("OAUTH2_RESPONSE_TYPE");
+            codeChallenge = (String) session.getAttribute("OAUTH2_CODE_CHALLENGE");
+            codeChallengeMethod = (String) session.getAttribute("OAUTH2_CODE_CHALLENGE_METHOD");
+
+            log.info("[OAuth2AuthenticationSuccessHandler] Parámetros recuperados de sesión");
+
+            // Limpiar sesión
+            session.removeAttribute("OAUTH2_REDIRECT_URI");
+            session.removeAttribute("OAUTH2_CLIENT_ID");
+            session.removeAttribute("OAUTH2_STATE");
+            session.removeAttribute("OAUTH2_SCOPE");
+            session.removeAttribute("OAUTH2_RESPONSE_TYPE");
+            session.removeAttribute("OAUTH2_CODE_CHALLENGE");
+            session.removeAttribute("OAUTH2_CODE_CHALLENGE_METHOD");
+        }
+
+        // Fallback a cookies si no hay sesión (compatibilidad)
+        if (redirectUri == null) {
+            redirectUri = getCookieValue(request, "OAUTH2_REDIRECT_URI");
+        }
+        if (clientId == null) {
+            clientId = getCookieValue(request, "OAUTH2_CLIENT_ID");
+        }
+        if (state == null) {
+            state = getCookieValue(request, "OAUTH2_STATE");
+        }
+        if (scope == null) {
+            scope = getCookieValue(request, "OAUTH2_SCOPE");
+        }
+        if (responseType == null) {
+            responseType = getCookieValue(request, "OAUTH2_RESPONSE_TYPE");
+        }
+        if (codeChallenge == null) {
+            codeChallenge = getCookieValue(request, "OAUTH2_CODE_CHALLENGE");
+        }
+        if (codeChallengeMethod == null) {
+            codeChallengeMethod = getCookieValue(request, "OAUTH2_CODE_CHALLENGE_METHOD");
+        }
 
         log.info(
-                "[OAuth2AuthenticationSuccessHandler] Cookies leídas - redirect_uri: {}, client_id: {}, state: {}, scope: {}",
+                "[OAuth2AuthenticationSuccessHandler] Parámetros finales - redirect_uri: {}, client_id: {}, state: {}, scope: {}",
                 redirectUri, clientId, state, scope);
-        log.info("[OAuth2AuthenticationSuccessHandler] PKCE cookies - code_challenge: {}, code_challenge_method: {}",
+        log.info("[OAuth2AuthenticationSuccessHandler] PKCE - code_challenge: {}, code_challenge_method: {}",
                 codeChallenge, codeChallengeMethod);
 
         // Limpiar cookies
@@ -89,8 +135,7 @@ public class OAuth2AuthenticationSuccessHandler implements AuthenticationSuccess
         }
 
         log.warn(
-                "[OAuth2AuthenticationSuccessHandler] No se encontraron parámetros OAuth2 en cookies, redirigiendo a /");
-        // Por defecto, redirigir a la página principal
+                "[OAuth2AuthenticationSuccessHandler] No se encontraron parámetros OAuth2, redirigiendo a /");
         response.sendRedirect("/");
     }
 
@@ -100,8 +145,7 @@ public class OAuth2AuthenticationSuccessHandler implements AuthenticationSuccess
             for (Cookie cookie : cookies) {
                 if (cookie.getName().equals(name)) {
                     String value = cookie.getValue();
-                    log.debug("[OAuth2AuthenticationSuccessHandler] Cookie {} encontrada con valor: {}", name, value);
-                    // URL-decode el valor porque las cookies están codificadas
+                    log.debug("[OAuth2AuthenticationSuccessHandler] Cookie {} encontrada", name);
                     return urlDecode(value);
                 }
             }
@@ -122,6 +166,7 @@ public class OAuth2AuthenticationSuccessHandler implements AuthenticationSuccess
             cookie.setPath("/");
             cookie.setMaxAge(0);
             cookie.setSecure(true);
+            cookie.setDomain(null); // Importante: sin dominio específico
             response.addCookie(cookie);
         }
     }

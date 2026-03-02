@@ -7,12 +7,13 @@ spec:
   selector:
     app: oauth2-server
   ports:
-    - name: http
+    - name: https-8443
       port: 8443
       targetPort: 8443
       protocol: TCP
-    - name: https
+    - name: https-443
       port: 443
       targetPort: 8443
+      nodePort: 30444
       protocol: TCP
-  type: ClusterIP
+  type: NodePort
