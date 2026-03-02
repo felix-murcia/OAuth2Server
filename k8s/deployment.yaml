@@ -15,7 +15,7 @@ spec:
     spec:
       initContainers:
       - name: generate-keystore
-        image: felixmurcia/oauth2server:v20260227-1320
+        image: felixmurcia/oauth2server:v20260302-1406
         command:
           - /bin/sh
           - -c
@@ -43,13 +43,6 @@ spec:
             echo "=== keystore generado ==="
             ls -la keystore.p12
         env:
-        - name: SERVER_FORWARD_HEADERS_STRATEGY
-          value: "framework"
-        - name: SERVER_USE_FORWARD_HEADERS
-          value: "true"
-        - name: SERVER_ADDRESS
-          value: "0.0.0.0"
-          
         - name: KEYSTORE_PASSWORD
           valueFrom:
             secretKeyRef:
@@ -64,12 +57,32 @@ spec:
 
       containers:
       - name: oauth2-server
-        image: felixmurcia/oauth2server:v20260227-1320
+        image: felixmurcia/oauth2server:v20260302-1406
         command:
           - java
           - -jar
           - /app/app.jar
         env:
+        # ===== CONFIGURACIÓN CRÍTICA PARA PROXY =====
+        - name: SERVER_FORWARD_HEADERS_STRATEGY
+          value: "framework"
+        - name: SERVER_USE_FORWARD_HEADERS
+          value: "true"
+        - name: SERVER_ADDRESS
+          value: "0.0.0.0"
+        - name: SERVER_PORT
+          value: "8443"
+        - name: SERVER_SSL_ENABLED
+          value: "true"
+        - name: SERVER_SSL_KEY_STORE
+          value: "/keystore/keystore.p12"
+        - name: SERVER_SSL_KEY_STORE_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: tls-keystore-popos
+              key: keystore-password
+        
+        # ===== CONFIGURACIÓN EXISTENTE (tus secretos) =====
         - name: SPRING_PROFILES_ACTIVE
           value: prod
         - name: JWT_SIGNING_KEY
@@ -142,22 +155,6 @@ spec:
             secretKeyRef:
               name: oauth2-secrets
               key: TRANSCRIBEAPP_REDIRECT_URI
-        - name: SERVER_PORT
-          value: "8443"
-        - name: SERVER_SSL_ENABLED
-          value: "true"
-        - name: SERVER_SSL_KEY_STORE
-          value: "/keystore/keystore.p12"
-        - name: SERVER_SSL_KEY_STORE_PASSWORD
-          valueFrom:
-            secretKeyRef:
-              name: tls-keystore-popos
-              key: keystore-password
-        - name: KEYSTORE_PASSWORD
-          valueFrom:
-            secretKeyRef:
-              name: tls-keystore-popos
-              key: keystore-password
         - name: SSL_CERT_FILE
           valueFrom:
             secretKeyRef:
@@ -170,6 +167,12 @@ spec:
               key: SSL_KEY_FILE
         - name: SSL_KEY_STORE
           value: "/keystore/keystore.p12"
+        - name: KEYSTORE_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: tls-keystore-popos
+              key: keystore-password
+              
         ports:
         - containerPort: 8443
           name: https

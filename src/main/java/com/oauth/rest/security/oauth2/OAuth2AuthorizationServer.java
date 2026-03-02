@@ -50,12 +50,13 @@ public class OAuth2AuthorizationServer {
         @Value("${oauth2.refresh-token-validity-seconds}")
         private int defaultRefreshTokenValiditySeconds;
 
-        private final OAuth2ClientProperties clientProperties;
+        @Value("${ISSUER_URL:http://localhost:8080}")
+        private String issuerUrl;
+
+        // Eliminamos la dependencia de OAuth2ClientProperties
         private final OAuth2ParameterSavingFilter oauth2ParameterSavingFilter;
 
-        public OAuth2AuthorizationServer(OAuth2ClientProperties clientProperties,
-                        OAuth2ParameterSavingFilter oauth2ParameterSavingFilter) {
-                this.clientProperties = clientProperties;
+        public OAuth2AuthorizationServer(OAuth2ParameterSavingFilter oauth2ParameterSavingFilter) {
                 this.oauth2ParameterSavingFilter = oauth2ParameterSavingFilter;
                 System.out.println("=== OAuth2AuthorizationServer INITIALIZED ===");
                 log.info("=== OAuth2AuthorizationServer INITIALIZED ===");
@@ -83,21 +84,17 @@ public class OAuth2AuthorizationServer {
                                                 "/connect/register",
                                                 "/oauth2/.*",
                                                 "/oauth/.*")
-                                // Add OAuth2ParameterSavingFilter BEFORE the authorization server filters
-                                // This saves OAuth2 params to cookies before redirecting to login
                                 .addFilterBefore(oauth2ParameterSavingFilter,
                                                 UsernamePasswordAuthenticationFilter.class)
                                 .with(authorizationServerConfigurer, Customizer.withDefaults())
                                 .authorizeHttpRequests(authorize -> authorize
                                                 .anyRequest().authenticated());
 
-                // Habilitar OpenID Connect
                 http.getConfigurer(OAuth2AuthorizationServerConfigurer.class)
                                 .oidc(Customizer.withDefaults())
                                 .authorizationEndpoint(authorizationEndpoint -> authorizationEndpoint
                                                 .consentPage("/oauth2/consent"));
 
-                // Manejo de excepciones
                 http.exceptionHandling(exceptions -> exceptions
                                 .authenticationEntryPoint(new LoginUrlAuthenticationEntryPoint("/login")));
 
@@ -112,80 +109,90 @@ public class OAuth2AuthorizationServer {
 
                 List<RegisteredClient> clients = new ArrayList<>();
 
+                // Leer configuración directamente de variables de entorno
                 String cineClientSecret = System.getenv("CINE_PLATFORM_SECRET");
                 String cineRedirectUri = System.getenv("CINE_PLATFORM_REDIRECT_URI");
 
                 System.out.println("CINE_PLATFORM_SECRET: " + cineClientSecret);
                 System.out.println("CINE_PLATFORM_REDIRECT_URI: " + cineRedirectUri);
+                System.out.println("ISSUER_URL configurado: " + issuerUrl);
 
-                log.debug("=== DIAGNÓSTICO CLIENT PROPERTIES ===");
-                log.debug("clientProperties es null? {}", clientProperties == null);
-                if (clientProperties != null) {
-                        log.debug("clientProperties.getClients() es null? {}", clientProperties.getClients() == null);
-                        if (clientProperties.getClients() != null) {
-                                log.debug("Número de clientes en properties: {}", clientProperties.getClients().size());
-                        }
-                }
+                // Cliente cine-platform
+                if (cineClientSecret != null && cineRedirectUri != null) {
+                        RegisteredClient cinePlatformClient = RegisteredClient.withId(UUID.randomUUID().toString())
+                                        .clientId("cine-platform")
+                                        .clientSecret(passwordEncoder.encode(cineClientSecret))
+                                        .authorizationGrantType(AuthorizationGrantType.AUTHORIZATION_CODE)
+                                        .authorizationGrantType(AuthorizationGrantType.REFRESH_TOKEN)
+                                        .authorizationGrantType(AuthorizationGrantType.CLIENT_CREDENTIALS)
+                                        .redirectUri(cineRedirectUri)
+                                        .scope("openid")
+                                        .scope("profile")
+                                        .scope("read")
+                                        .scope("write")
+                                        .clientSettings(ClientSettings.builder()
+                                                        .requireAuthorizationConsent(false)
+                                                        .requireProofKey(false)
+                                                        .build())
+                                        .tokenSettings(TokenSettings.builder()
+                                                        .accessTokenTimeToLive(
+                                                                        Duration.ofSeconds(
+                                                                                        defaultAccessTokenValiditySeconds))
+                                                        .refreshTokenTimeToLive(
+                                                                        Duration.ofSeconds(
+                                                                                        defaultRefreshTokenValiditySeconds))
+                                                        .reuseRefreshTokens(false)
+                                                        .build())
+                                        .build();
 
-                // Si hay clientes configurados en properties, usarlos
-                if (clientProperties != null && clientProperties.getClients() != null
-                                && !clientProperties.getClients().isEmpty()) {
-
-                        for (OAuth2ClientProperties.ClientConfig config : clientProperties.getClients()) {
-                                RegisteredClient.Builder builder = RegisteredClient.withId(UUID.randomUUID().toString())
-                                                .clientId(config.getClientId())
-                                                .clientSecret(passwordEncoder.encode(config.getClientSecret()))
-                                                .authorizationGrantType(AuthorizationGrantType.AUTHORIZATION_CODE)
-                                                .authorizationGrantType(AuthorizationGrantType.REFRESH_TOKEN)
-                                                .authorizationGrantType(AuthorizationGrantType.CLIENT_CREDENTIALS)
-                                                .clientSettings(ClientSettings.builder()
-                                                                .requireAuthorizationConsent(config.isRequireConsent())
-                                                                .requireProofKey(config.isRequireProofKey())
-                                                                .build());
-
-                                // Configurar token settings
-                                TokenSettings.Builder tokenBuilder = TokenSettings.builder()
-                                                .reuseRefreshTokens(false);
-
-                                if (config.getAccessTokenValiditySeconds() != null) {
-                                        tokenBuilder.accessTokenTimeToLive(
-                                                        Duration.ofSeconds(config.getAccessTokenValiditySeconds()));
-                                } else {
-                                        tokenBuilder.accessTokenTimeToLive(
-                                                        Duration.ofSeconds(defaultAccessTokenValiditySeconds));
-                                }
-
-                                if (config.getRefreshTokenValiditySeconds() != null) {
-                                        tokenBuilder.refreshTokenTimeToLive(
-                                                        Duration.ofSeconds(config.getRefreshTokenValiditySeconds()));
-                                } else {
-                                        tokenBuilder.refreshTokenTimeToLive(
-                                                        Duration.ofSeconds(defaultRefreshTokenValiditySeconds));
-                                }
-
-                                builder.tokenSettings(tokenBuilder.build());
-
-                                // Añadir redirect URIs
-                                if (config.getRedirectUris() != null) {
-                                        for (String redirectUri : config.getRedirectUris()) {
-                                                builder.redirectUri(redirectUri);
-                                        }
-                                }
-
-                                // Añadir scopes
-                                if (config.getScopes() != null) {
-                                        for (String scope : config.getScopes()) {
-                                                builder.scope(scope);
-                                        }
-                                }
-
-                                clients.add(builder.build());
-                                System.out.println("✅ Cliente cine-platform añadido a la lista");
-                        }
+                        clients.add(cinePlatformClient);
+                        System.out.println("✅ Cliente cine-platform añadido a la lista");
                 } else {
                         System.out.println("❌ No se encontraron variables de entorno para cine-platform");
-                        log.warn("No se encontraron clientes en properties. Usando cliente por defecto.");
-                        clients.add(createDefaultClient(passwordEncoder));
+                }
+
+                // Cliente transcriberapp (si existe)
+                String transcribeAppSecret = System.getenv("TRANSCRIBEAPP_SECRET");
+                String transcribeAppRedirectUri = System.getenv("TRANSCRIBEAPP_REDIRECT_URI");
+
+                if (transcribeAppSecret != null && transcribeAppRedirectUri != null) {
+                        RegisteredClient transcribeAppClient = RegisteredClient.withId(UUID.randomUUID().toString())
+                                        .clientId("transcriberapp")
+                                        .clientSecret(passwordEncoder.encode(transcribeAppSecret))
+                                        .authorizationGrantType(AuthorizationGrantType.AUTHORIZATION_CODE)
+                                        .authorizationGrantType(AuthorizationGrantType.REFRESH_TOKEN)
+                                        .authorizationGrantType(AuthorizationGrantType.CLIENT_CREDENTIALS)
+                                        .redirectUri(transcribeAppRedirectUri)
+                                        .scope("openid")
+                                        .scope("profile")
+                                        .scope("read")
+                                        .scope("write")
+                                        .clientSettings(ClientSettings.builder()
+                                                        .requireAuthorizationConsent(true)
+                                                        .requireProofKey(false)
+                                                        .build())
+                                        .tokenSettings(TokenSettings.builder()
+                                                        .accessTokenTimeToLive(
+                                                                        Duration.ofSeconds(
+                                                                                        defaultAccessTokenValiditySeconds))
+                                                        .refreshTokenTimeToLive(
+                                                                        Duration.ofSeconds(
+                                                                                        defaultRefreshTokenValiditySeconds))
+                                                        .reuseRefreshTokens(false)
+                                                        .build())
+                                        .build();
+
+                        clients.add(transcribeAppClient);
+                        System.out.println("✅ Cliente transcriberapp añadido a la lista");
+                }
+
+                if (clients.isEmpty()) {
+                        System.out.println(
+                                        "❌ No se encontraron clientes configurados. No se creará cliente por defecto.");
+                        System.out.println(
+                                        "❌ Por favor configure las variables de entorno CINE_PLATFORM_SECRET y CINE_PLATFORM_REDIRECT_URI");
+                        // No crear cliente por defecto con credenciales inseguras
+                        // throw new IllegalStateException("No hay clientes OAuth2 configurados");
                 }
 
                 System.out.println("📦 Número total de clientes: " + clients.size());
@@ -196,7 +203,7 @@ public class OAuth2AuthorizationServer {
         private RegisteredClient createDefaultClient(PasswordEncoder passwordEncoder) {
                 return RegisteredClient.withId(UUID.randomUUID().toString())
                                 .clientId("default-client")
-                                .clientSecret(passwordEncoder.encode("123456"))
+                                .clientSecret(passwordEncoder.encode("${DEFAULT_CLIENT_SECRET}"))
                                 .authorizationGrantType(AuthorizationGrantType.AUTHORIZATION_CODE)
                                 .authorizationGrantType(AuthorizationGrantType.REFRESH_TOKEN)
                                 .authorizationGrantType(AuthorizationGrantType.CLIENT_CREDENTIALS)
@@ -255,6 +262,7 @@ public class OAuth2AuthorizationServer {
         @Bean
         public AuthorizationServerSettings authorizationServerSettings() {
                 return AuthorizationServerSettings.builder()
+                                .issuer(issuerUrl)
                                 .authorizationEndpoint("/oauth2/authorize")
                                 .tokenEndpoint("/oauth2/token")
                                 .jwkSetEndpoint("/oauth2/jwks")
