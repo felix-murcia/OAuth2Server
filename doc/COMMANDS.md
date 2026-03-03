@@ -114,8 +114,8 @@ docker exec -i <CONTENEDOR> psql -U oauth2_user oauth2_dev < backup.sql
 
 ```sql
 UPDATE usuarios
-SET password = '$2b$12$...hash bcrypt...'
-WHERE username = 'admin';
+SET password = '$2b$12$t3XDd8U5098eeYodNTlJp.u6Rze/P8zdjmEZ.SklfEl6lFvMyUCtS'
+WHERE username = 'dummy';
 ```
 
 ---
