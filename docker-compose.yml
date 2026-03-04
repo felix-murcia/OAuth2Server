@@ -134,6 +134,11 @@ services:
       ISSUER_URL: ${ISSUER_URL:-http://localhost:8080}
       JWT_AUDIENCE: ${JWT_AUDIENCE:-oauth2-client}
       JWT_SIGNING_KEY: ${JWT_SIGNING_KEY}
+
+      # ===========================================
+      # Contact email
+      # ===========================================
+      CONTACT_EMAIL: ${CONTACT_EMAIL}
       
     env_file:
       - .env
