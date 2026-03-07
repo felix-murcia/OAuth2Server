@@ -1,5 +1,7 @@
 package com.oauth.rest.security.oauth2;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.oauth2.server.authorization.token.JwtEncodingContext;
 import org.springframework.security.oauth2.server.authorization.token.OAuth2TokenCustomizer;
@@ -12,28 +14,27 @@ import java.util.stream.Collectors;
 @Configuration
 public class CustomTokenEnhancer implements OAuth2TokenCustomizer<JwtEncodingContext> {
 
+    private static final Logger log = LoggerFactory.getLogger(CustomTokenEnhancer.class);
+
     @Override
     public void customize(JwtEncodingContext context) {
-        if (context.getTokenType().getValue().equals("access_token")) {
-
-            // Obtener la autenticación del usuario
-            Authentication authentication = context.getPrincipal();
-
-            // Extraer los roles/authorities
-            Set<String> authorities = authentication.getAuthorities().stream()
-                    .map(GrantedAuthority::getAuthority)
-                    .collect(Collectors.toSet());
-
-            // Añadir claims personalizados
-            context.getClaims().claims(claims -> {
-                claims.put("application", "OAuth2Server");
-                claims.put("roles", authorities); // ← AÑADIR LOS ROLES
-            });
-
-            // Log para depuración
-            System.out.println("=== CustomTokenEnhancer ===");
-            System.out.println("Roles añadidos al token: " + authorities);
-            System.out.println("===========================");
+        if (!"access_token".equals(context.getTokenType().getValue())) {
+            return;
         }
+
+        Authentication authentication = context.getPrincipal();
+        if (authentication == null) {
+            return;
+        }
+
+        // Añadir roles directamente (sin filtrar)
+        Set<String> authorities = authentication.getAuthorities().stream()
+                .map(GrantedAuthority::getAuthority)
+                .collect(Collectors.toSet());
+
+        context.getClaims().claim("roles", authorities);
+        
+        log.debug("Token customized for user: {} with roles: {}", 
+                 authentication.getName(), authorities);
     }
 }
