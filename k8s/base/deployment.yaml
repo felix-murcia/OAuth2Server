@@ -16,7 +16,7 @@ spec:
     spec:
       initContainers:
       - name: generate-keystore
-        image: felixmurcia/oauth2server:v20260304-2119
+        image: felixmurcia/oauth2server:v20260305-1816
         command:
           - /bin/sh
           - -c
@@ -58,7 +58,7 @@ spec:
 
       containers:
       - name: oauth2-server
-        image: felixmurcia/oauth2server:v20260304-2119
+        image: felixmurcia/oauth2server:v20260305-1816
         command:
           - java
           - -jar
@@ -200,6 +200,11 @@ spec:
             secretKeyRef:
               name: oauth2-secrets
               key: CONTACT_EMAIL
+        - name: cors-allowed-origins
+          valueFrom:
+            secretKeyRef:
+              name: oauth2-secrets
+              key: cors-allowed-origins
         - name: SSL_KEY_STORE
           value: "/keystore/keystore.p12"
         - name: KEYSTORE_PASSWORD
