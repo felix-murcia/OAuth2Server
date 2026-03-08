@@ -7,22 +7,21 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpMethod;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.ProviderManager;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint;
+import org.springframework.security.web.authentication.SavedRequestAwareAuthenticationSuccessHandler;
+import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
+import org.springframework.security.web.csrf.CsrfTokenRequestAttributeHandler;
 import org.springframework.security.web.firewall.StrictHttpFirewall;
+import org.springframework.security.oauth2.server.authorization.config.annotation.web.configuration.OAuth2AuthorizationServerConfiguration;
+import org.springframework.security.oauth2.server.authorization.config.annotation.web.configurers.OAuth2AuthorizationServerConfigurer;
 import org.springframework.web.filter.ForwardedHeaderFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
-
-import com.oauth.rest.security.oauth2.OAuth2ParameterSavingFilter;
-import com.oauth.rest.security.oauth2.OAuth2AuthenticationSuccessHandler;
-import com.oauth.rest.service.CustomUserDetailsService;
 
 import java.util.Arrays;
 
@@ -30,125 +29,179 @@ import java.util.Arrays;
 @EnableWebSecurity
 public class SecurityConfig {
 
-        private static final Logger log = LoggerFactory.getLogger(SecurityConfig.class);
+    private static final Logger log = LoggerFactory.getLogger(SecurityConfig.class);
 
-        @SuppressWarnings("unused")
-        private final PasswordEncoder passwordEncoder;
-        @SuppressWarnings("unused")
-        private final CustomUserDetailsService customUserDetailsService;
-        private final AppAwareAuthenticationProvider appAwareAuthenticationProvider;
-        private final OAuth2ParameterSavingFilter oauth2ParameterSavingFilter;
-        private final OAuth2AuthenticationSuccessHandler oauth2AuthenticationSuccessHandler;
+    // Dependencias necesarias
+    private final ApplicationAuthenticationDetailsSource applicationAuthenticationDetailsSource;
+    private final ClientIdExtractorFilter clientIdExtractorFilter;
 
-        // Constructor actualizado - eliminado OAuth2SavedRequestAwareAuthSuccessHandler
-        public SecurityConfig(PasswordEncoder passwordEncoder,
-                        CustomUserDetailsService customUserDetailsService,
-                        AppAwareAuthenticationProvider appAwareAuthenticationProvider,
-                        OAuth2ParameterSavingFilter oauth2ParameterSavingFilter,
-                        OAuth2AuthenticationSuccessHandler oauth2AuthenticationSuccessHandler) {
-                this.passwordEncoder = passwordEncoder;
-                this.customUserDetailsService = customUserDetailsService;
-                this.appAwareAuthenticationProvider = appAwareAuthenticationProvider;
-                this.oauth2ParameterSavingFilter = oauth2ParameterSavingFilter;
-                this.oauth2AuthenticationSuccessHandler = oauth2AuthenticationSuccessHandler;
-                log.info("[SecurityConfig] OAuth2AuthenticationSuccessHandler inyectado: {}",
-                                oauth2AuthenticationSuccessHandler.getClass().getName());
-        }
+    public SecurityConfig(
+            ApplicationAuthenticationDetailsSource applicationAuthenticationDetailsSource,
+            ClientIdExtractorFilter clientIdExtractorFilter) {
+        this.applicationAuthenticationDetailsSource = applicationAuthenticationDetailsSource;
+        this.clientIdExtractorFilter = clientIdExtractorFilter;
+        log.info("[SecurityConfig] Initialized");
+    }
 
-        @Bean
-        public StrictHttpFirewall httpFirewall() {
-                StrictHttpFirewall firewall = new StrictHttpFirewall();
-                firewall.setAllowSemicolon(true);
-                firewall.setAllowUrlEncodedPercent(true);
-                firewall.setAllowUrlEncodedSlash(true);
-                firewall.setAllowBackSlash(true);
-                firewall.setAllowUrlEncodedDoubleSlash(true);
-                return firewall;
-        }
+    @Bean
+    public StrictHttpFirewall httpFirewall() {
+        StrictHttpFirewall firewall = new StrictHttpFirewall();
+        firewall.setAllowSemicolon(true);
+        firewall.setAllowUrlEncodedPercent(true);
+        firewall.setAllowUrlEncodedSlash(false);
+        firewall.setAllowBackSlash(false);
+        firewall.setAllowUrlEncodedDoubleSlash(false);
+        return firewall;
+    }
 
-        @Bean
-        public AuthenticationManager authenticationManager() {
-                return new ProviderManager(appAwareAuthenticationProvider);
-        }
+    @Bean
+    @Order(0)
+    public FilterRegistrationBean<ForwardedHeaderFilter> forwardedHeaderFilter() {
+        FilterRegistrationBean<ForwardedHeaderFilter> registration = new FilterRegistrationBean<>();
+        registration.setFilter(new ForwardedHeaderFilter());
+        registration.setOrder(0);
+        return registration;
+    }
 
-        /**
-         * Este filtro asegura que Spring use las cabeceras "Forwarded"
-         * para construir las URLs correctamente.
-         */
-        @Bean
-        @Order(0)
-        public FilterRegistrationBean<ForwardedHeaderFilter> forwardedHeaderFilter() {
-                FilterRegistrationBean<ForwardedHeaderFilter> registration = new FilterRegistrationBean<>();
-                registration.setFilter(new ForwardedHeaderFilter());
-                registration.setOrder(0);
-                return registration;
-        }
+    @Bean
+    public CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration configuration = new CorsConfiguration();
+        configuration.setAllowedOrigins(Arrays.asList(
+                "https://pop-os.tail921051.ts.net",
+                "https://cine.nbes.blog",
+                "https://oauth2.nbes.blog",
+                "http://localhost:5000"  // Añadido para desarrollo
+        ));
+        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+        configuration.setAllowedHeaders(Arrays.asList(
+                "Authorization",
+                "Content-Type",
+                "X-Requested-With",
+                "X-CSRF-TOKEN",
+                "Accept"
+        ));
+        configuration.setExposedHeaders(Arrays.asList("X-CSRF-TOKEN"));
+        configuration.setAllowCredentials(true);
+        configuration.setMaxAge(3600L);
 
-        /**
-         * Configuración CORS para aceptar peticiones de los dominios permitidos
-         */
-        @Bean
-        public CorsConfigurationSource corsConfigurationSource() {
-                CorsConfiguration configuration = new CorsConfiguration();
-                configuration.setAllowedOrigins(Arrays.asList(
-                                "https://pop-os.tail921051.ts.net",
-                                "https://cine.nbes.blog",
-                                "https://oauth2.nbes.blog"));
-                configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-                configuration.setAllowedHeaders(Arrays.asList("*"));
-                configuration.setAllowCredentials(true);
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", configuration);
+        return source;
+    }
 
-                UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-                source.registerCorsConfiguration("/**", configuration);
-                return source;
-        }
+    @Bean
+    @Order(1)
+    public SecurityFilterChain authorizationServerSecurityFilterChain(HttpSecurity http) throws Exception {
+        // Configurar matcher primero
+        http.securityMatcher(
+            "/oauth2/authorize",
+            "/oauth2/token",
+            "/oauth2/jwks",
+            "/oauth2/introspect",
+            "/oauth2/revoke",
+            "/userinfo",
+            "/connect/register",
+            "/.well-known/**"
+        );
+        
+        // Configurar CORS y CSRF
+        http
+            .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+            .csrf(csrf -> csrf
+                .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
+                .csrfTokenRequestHandler(new CsrfTokenRequestAttributeHandler())
+                .ignoringRequestMatchers(
+                    "/oauth2/token",
+                    "/oauth2/introspect", 
+                    "/oauth2/revoke"
+                )
+            )
+            .exceptionHandling(exceptions -> exceptions
+                .authenticationEntryPoint(new LoginUrlAuthenticationEntryPoint("/login"))
+            );
+        
+        // Aplicar configuración OAuth2 (esto incluye su propio authorizeHttpRequests)
+        OAuth2AuthorizationServerConfiguration.applyDefaultSecurity(http);
+        
+        // Habilitar OIDC
+        http.getConfigurer(OAuth2AuthorizationServerConfigurer.class)
+            .oidc(Customizer.withDefaults());
 
-        // PRIMERO: Rutas públicas (estáticas, error)
-        @Bean
-        @Order(1)
-        public SecurityFilterChain publicFilterChain(HttpSecurity http) throws Exception {
-                http.securityMatcher(
-                                "/css/**", "/js/**", "/images/**", "/webjars/**", "/h2-console/**",
-                                "/favicon.ico",
-                                "/error",
-                                "/invalid-application")
-                                .authorizeHttpRequests(authz -> authz.anyRequest().permitAll())
-                                .headers(headers -> headers.frameOptions(frame -> frame.disable()))
-                                .csrf(csrf -> csrf.disable());
+        log.info("[SecurityConfig] OAuth2 Authorization Server configured");
+        return http.build();
+    }
 
-                return http.build();
-        }
+    @Bean
+    @Order(2)
+    public SecurityFilterChain defaultSecurityFilterChain(HttpSecurity http) throws Exception {
+        http
+            // Añadir nuestro filtro personalizado ANTES de UsernamePasswordAuthenticationFilter
+            .addFilterBefore(clientIdExtractorFilter, org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter.class)
+            
+            .securityMatcher(
+                "/",
+                "/login",
+                "/logout",
+                "/css/**",
+                "/js/**",
+                "/images/**",
+                "/webjars/**",
+                "/favicon.ico",
+                "/error",
+                "/invalid-application",
+                "/h2-console/**",
+                "/api/**",
+                "/user/**"
+            )
+            .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+            .csrf(csrf -> csrf
+                .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
+                .csrfTokenRequestHandler(new CsrfTokenRequestAttributeHandler())
+                // Ignorar CSRF para el endpoint de login
+                .ignoringRequestMatchers("/login")
+            )
+            .authorizeHttpRequests(authorize -> authorize
+                // Rutas públicas
+                .requestMatchers(new String[]{
+                        "/css/**", 
+                        "/js/**", 
+                        "/images/**", 
+                        "/webjars/**",
+                        "/favicon.ico",
+                        "/error", 
+                        "/invalid-application",
+                        "/h2-console/**",
+                        "/login", 
+                        "/logout"
+                }).permitAll()
+                // OPTIONS preflight
+                .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+                // API protegidas
+                .requestMatchers("/api/**").authenticated()
+                .requestMatchers("/user/**").authenticated()
+                .anyRequest().authenticated()
+            )
+            .formLogin(form -> form
+                .loginPage("/login")
+                .loginProcessingUrl("/login")
+                .authenticationDetailsSource(applicationAuthenticationDetailsSource)
+                // Usar el success handler por defecto de Spring (ya maneja SavedRequest)
+                .successHandler(new SavedRequestAwareAuthenticationSuccessHandler())
+                .permitAll()
+            )
+            .logout(logout -> logout
+                .logoutSuccessUrl("/login?logout=true")
+                .permitAll()
+            )
+            .sessionManagement(session -> session
+                .sessionFixation().migrateSession()
+                .invalidSessionUrl("/login")
+            )
+            .headers(headers -> headers
+                .frameOptions(frame -> frame.disable())
+            );
 
-        // SEGUNDO: Login y todo lo demás (form login para autenticación)
-        @Bean
-        @Order(2)
-        public SecurityFilterChain defaultFilterChain(HttpSecurity http) throws Exception {
-                http.securityMatcher(
-                                "/",
-                                "/login",
-                                "/api/**",
-                                "/user/**")
-                                .addFilterBefore(oauth2ParameterSavingFilter,
-                                                UsernamePasswordAuthenticationFilter.class)
-                                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
-                                .authorizeHttpRequests(authz -> authz
-                                                .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-                                                .requestMatchers("/oauth2/authorize").authenticated()
-                                                .anyRequest().authenticated())
-                                .formLogin(form -> form
-                                                .loginPage("/login")
-                                                .loginProcessingUrl("/login")
-                                                .successHandler(oauth2AuthenticationSuccessHandler)
-                                                .failureUrl("/login?error=true")
-                                                .permitAll())
-                                .logout(logout -> logout
-                                                .logoutSuccessUrl("/login?logout=true")
-                                                .permitAll())
-                                .sessionManagement(session -> session
-                                                .sessionFixation().migrateSession()
-                                                .invalidSessionUrl("/login"))
-                                .csrf(csrf -> csrf.disable());
-
-                return http.build();
-        }
+        log.info("[SecurityConfig] Default security configured - ClientIdExtractorFilter added");
+        return http.build();
+    }
 }
