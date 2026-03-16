@@ -19,6 +19,6 @@ public class Application {
 		Environment env = app.run(args).getEnvironment();
 
 		// Verificar configuración (solo para depuración)
-		log.info("Perfiles activos: {}", String.join(", ", env.getActiveProfiles()));
+		log.debug("Perfiles activos: {}", String.join(", ", env.getActiveProfiles()));
 	}
 }

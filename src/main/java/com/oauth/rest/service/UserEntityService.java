@@ -35,9 +35,9 @@ public class UserEntityService extends BaseService<UserEntity, Long, UserEntityR
     }
 
     public Optional<UserEntity> findUserByUsername(String username) {
-        log.info("🔍 Buscando usuario por username: {}", username);
+        log.debug("Buscando usuario por username");
         Optional<UserEntity> user = repository.findByUsername(username);
-        log.info("🔍 Resultado: {}", user.isPresent() ? "encontrado" : "no encontrado");
+        log.debug("Resultado: {}", user.isPresent() ? "encontrado" : "no encontrado");
         return user;
     }
 
