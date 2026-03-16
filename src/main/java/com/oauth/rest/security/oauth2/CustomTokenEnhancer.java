@@ -21,32 +21,24 @@ public class CustomTokenEnhancer {
 
     public CustomTokenEnhancer(UserEntityService userService) {
         this.userService = userService;
-        log.info("✅ CustomTokenEnhancer bean creado");
     }
 
     @Bean
     public OAuth2TokenCustomizer<JwtEncodingContext> jwtTokenCustomizer() {
         return context -> {
-            log.info("=== INICIO CUSTOMIZER ===");
-            log.info("Token type: {}", context.getTokenType().getValue());
-            log.info("Grant type: {}", context.getAuthorizationGrantType().getValue());
             
             // Solo procesar access tokens
             if (!"access_token".equals(context.getTokenType().getValue())) {
-                log.info("No es access_token, saliendo");
+                log.debug("No es access_token, saliendo");
                 return;
             }
 
             String username = context.getPrincipal().getName();
-            log.info("Username del principal: {}", username);
             
             // Buscar usuario
             UserEntity user = userService.findUserByUsername(username).orElse(null);
             
-            if (user != null) {
-                log.info("Usuario encontrado! ID: {}, Email: {}, FullName: {}", 
-                    user.getId(), user.getEmail(), user.getFullName());
-                
+            if (user != null) {                
                 String email = user.getEmail();
                 String name = user.getFullName() != null ? user.getFullName() : username;
                 
@@ -55,9 +47,8 @@ public class CustomTokenEnhancer {
                 context.getClaims().claim("email", email);
                 context.getClaims().claim("name", name);
                 
-                log.info("Claims a\u00f1adidos: sub={}, email={}, name={}", email, email, name);
             } else {
-                log.warn("Usuario NO encontrado en BD!");
+                log.debug("Usuario NO encontrado en BD!");
             }
             
             // Añadir roles
@@ -65,8 +56,6 @@ public class CustomTokenEnhancer {
                     .map(GrantedAuthority::getAuthority)
                     .collect(Collectors.toSet());
             context.getClaims().claim("roles", authorities);
-            
-            log.info("=== FIN CUSTOMIZER ===");
         };
     }
 }
