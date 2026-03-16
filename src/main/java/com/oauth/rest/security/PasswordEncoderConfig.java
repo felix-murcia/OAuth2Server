@@ -15,7 +15,7 @@ public class PasswordEncoderConfig {
     @Bean
     public PasswordEncoder passwordEncoder() {
         BCryptPasswordEncoder encoder = new BCryptPasswordEncoder(10);
-        log.info("BCryptPasswordEncoder initialized with strength: 10");
+        log.debug("BCryptPasswordEncoder initialized with strength: 10");
         return encoder;
     }
 }

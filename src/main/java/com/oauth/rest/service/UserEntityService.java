@@ -15,9 +15,13 @@ import com.oauth.rest.exception.UserPasswordException;
 import com.oauth.rest.model.Role;
 import com.oauth.rest.model.UserEntity;
 import com.oauth.rest.repository.UserEntityRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @Service
 public class UserEntityService extends BaseService<UserEntity, Long, UserEntityRepository> {
+
+    private static final Logger log = LoggerFactory.getLogger(UserEntityService.class);
 
     private final PasswordEncoder passwordEncoder;
     private final RoleService roleService;
@@ -31,7 +35,10 @@ public class UserEntityService extends BaseService<UserEntity, Long, UserEntityR
     }
 
     public Optional<UserEntity> findUserByUsername(String username) {
-        return this.repository.findByUsername(username);
+        log.debug("Buscando usuario por username");
+        Optional<UserEntity> user = repository.findByUsername(username);
+        log.debug("Resultado: {}", user.isPresent() ? "encontrado" : "no encontrado");
+        return user;
     }
 
     public Optional<UserEntity> findUserByEmail(String email) {

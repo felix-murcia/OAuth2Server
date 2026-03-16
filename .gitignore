@@ -87,3 +87,5 @@ src/main/resources/data.sql
 dist/
 out/
 bin/
+
+application-prod.properties
