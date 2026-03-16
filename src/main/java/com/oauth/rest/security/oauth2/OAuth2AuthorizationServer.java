@@ -60,7 +60,7 @@ public class OAuth2AuthorizationServer {
             throw new IllegalStateException("No OAuth2 clients configured");
         }
         
-        log.info("Registered {} OAuth2 clients", clients.size());
+        log.debug("Registered {} OAuth2 clients", clients.size());
         return new InMemoryRegisteredClientRepository(clients);
     }
 
@@ -71,7 +71,7 @@ public class OAuth2AuthorizationServer {
         
         if (secret != null && redirectUri != null && !secret.isBlank() && !redirectUri.isBlank()) {
             clients.add(createRegisteredClient(clientId, secret, redirectUri, passwordEncoder));
-            log.info("Client '{}' configured with redirect URI: {}", clientId, redirectUri);
+            log.debug("Client '{}' configured", clientId);
         } else {
             log.debug("Client '{}' not configured: missing environment variables", clientId);
         }

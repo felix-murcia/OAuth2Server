@@ -40,7 +40,7 @@ public class SecurityConfig {
             ClientIdExtractorFilter clientIdExtractorFilter) {
         this.applicationAuthenticationDetailsSource = applicationAuthenticationDetailsSource;
         this.clientIdExtractorFilter = clientIdExtractorFilter;
-        log.info("[SecurityConfig] Initialized");
+        log.debug("[SecurityConfig] Initialized");
     }
 
     @Bean
@@ -127,7 +127,7 @@ public class SecurityConfig {
         http.getConfigurer(OAuth2AuthorizationServerConfigurer.class)
             .oidc(Customizer.withDefaults());
 
-        log.info("[SecurityConfig] OAuth2 Authorization Server configured");
+        log.debug("[SecurityConfig] OAuth2 Authorization Server configured");
         return http.build();
     }
 
@@ -201,7 +201,7 @@ public class SecurityConfig {
                 .frameOptions(frame -> frame.disable())
             );
 
-        log.info("[SecurityConfig] Default security configured - ClientIdExtractorFilter added");
+        log.debug("[SecurityConfig] Default security configured - ClientIdExtractorFilter added");
         return http.build();
     }
 }
