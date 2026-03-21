@@ -45,7 +45,7 @@ public class OAuth2AuthorizationServer {
     private String issuerUrl;
 
     public OAuth2AuthorizationServer() {
-        issuerUrl = System.getenv("ISSUER_URL");
+        issuerUrl = System.getenv("ISSUER_URL") != null ? System.getenv("ISSUER_URL") : "http://localhost:8080";
     }
 
     @Bean
