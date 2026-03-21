@@ -4,6 +4,43 @@ OAuth2Server es un servidor de autenticación basado en **Spring Boot** que emit
 
 ---
 
+## 🏗️ Arquitectura
+
+Este proyecto implementa **Arquitectura Hexagonal** (Ports and Adapters) para mantener el código limpio, testeable y desacoplado del framework.
+
+```
+src/main/java/com/oauth/
+├── domain/                    # 🔵 NÚCLEO - Sin dependencias externas
+│   ├── exception/            # Excepciones del dominio
+│   ├── model/                # Entidades y value objects
+│   └── ports/                # Interfaces (contratos)
+│       └── in/               # Puertos de entrada
+│
+├── application/              # 🟢 CASOS DE USO
+│   └── usecase/             # Implementaciones de use cases
+│
+├── adapters/                 # 🟡 ADAPTADORES EXTERNOS
+│   ├── input/               # Adaptadores de entrada (Driven)
+│   │   └── rest/            # Controladores REST
+│   │
+│   └── output/              # Adaptadores de salida (Driving)
+│       ├── persistence/      # Repositorios JPA
+│       └── security/         # Adaptadores de seguridad
+│
+├── infrastructure/           # 🟠 INFRAESTRUCTURA
+│   └── service/             # Servicios específicos del framework
+│
+└── config/                   # 🔴 Configuración Spring
+```
+
+### Principios aplicados
+- **Dominio limpio**: La lógica de negocio no depende de frameworks
+- **Puertos**: Interfaces que definen contratos entre capas
+- **Adaptadores**: Implementaciones concretas de los puertos
+- **Inversión de dependencias**: Las dependencias apuntan hacia el dominio
+
+---
+
 ## 🚀 Inicio rápido
 
 ### Requisitos
@@ -14,8 +51,8 @@ OAuth2Server es un servidor de autenticación basado en **Spring Boot** que emit
 ### Ejecutar en 5 minutos
 
 ```bash
-# 1. Descargar el proyecto
-git clone https://github.com/la-usuario/OAuth2Server.git
+# 1. Clonar el proyecto
+git clone https://github.com/FelixMarin/OAuth2Server.git
 cd OAuth2Server
 
 # 2. Ejecutar con Docker Compose (incluye PostgreSQL)
@@ -23,7 +60,6 @@ docker-compose up --build
 
 # 3. Acceder a la aplicación
 # http://localhost:8080 (desarrollo)
-# https://localhost:8443 (producción)
 ```
 
 ---
@@ -61,118 +97,48 @@ El archivo `docker-compose.yml` configura automáticamente:
 
 ### Producción
 
-Configura las variables de entorno:
-
-```bash
-SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/oauth2_prod
-SPRING_DATASOURCE_USERNAME=oauth2_user
-SPRING_DATASOURCE_PASSWORD=la-contraseña-segura
-```
+Consulta `docker-compose.prod.yml` para la configuración de producción.
 
 ---
 
-## ⚙️ Configuración básica
+## ⚙️ Configuración
 
-### Cambiar puerto
+### Variables de entorno principales
 
-En `src/main/resources/application.properties`:
+| Variable | Descripción | Ejemplo |
+|----------|-------------|---------|
+| `SERVER_PORT` | Puerto de la aplicación | 8080 |
+| `SPRING_DATASOURCE_URL` | URL de PostgreSQL | jdbc:postgresql://postgres:5432/oauth2_dev |
+| `SPRING_DATASOURCE_USERNAME` | Usuario de BD | oauth2_user |
+| `SPRING_DATASOURCE_PASSWORD` | Contraseña de BD | oauth2_dev_password |
+| `JWT_SIGNING_KEY` | Clave para firmar tokens JWT | clave-secreta |
+| `CORS_ALLOWED_ORIGINS` | Orígenes permitidos para CORS | http://localhost:3000 |
 
-```properties
-server.port=8080
-```
+### Perfiles Spring
 
-### Cambiar usuario y contraseña por defecto
-
-En `src/main/resources/application-dev.properties`:
-
-```properties
-# Usuario administrador por defecto
-default.admin.username=admin
-default.admin.password=la-nueva-contraseña-segura
-```
-
-### Configuración de PostgreSQL (desarrollo)
-
-En `src/main/resources/application-dev.properties`:
-
-```properties
-spring.datasource.url=jdbc:postgresql://postgres-dev:5432/oauth2_dev
-spring.datasource.username=oauth2_user
-spring.datasource.password=oauth2_dev_password
-```
+- `dev`: Desarrollo (usa PostgreSQL en docker-compose)
+- `prod`: Producción (configuración optimizada)
 
 ---
 
 ## 🏢 Añadir una nueva aplicación
 
-Para que la aplicación pueda usar OAuth2, necesitas registrarla.
-
-### Paso 1: Configurar el cliente
-
-Edita `src/main/resources/application-dev.properties` y añade:
-
-```properties
-# Cliente para MI-APLICACION
-oauth2.clients[0].client-id=mi-aplicacion
-oauth2.clients[0].client-secret=mi-secreto-seguro
-oauth2.clients[0].redirect-uris[0]=http://localhost:3000/callback
-oauth2.clients[0].scopes[0]=openid
-oauth2.clients[0].scopes[1]=profile
-oauth2.clients[0].scopes[2]=read
-oauth2.clients[0].scopes[3]=write
-oauth2.clients[0].authorization-grant-types=authorization_code,client_credentials,refresh_token
-```
-
-### Explicación de cada campo
-
-| Campo | Descripción | Ejemplo |
-|-------|-------------|---------|
-| `client-id` | Identificador único de la app | mi-aplicacion |
-| `client-secret` | Contraseña secreta de la app | mi-secreto-seguro |
-| `redirect-uris` | URL donde OAuth2 devolverá al usuario | http://localhost:3000/callback |
-| `scopes` | Permisos que pide la app | openid, profile, read, write |
-| `authorization-grant-types` | Tipos de flujo OAuth2 soportados | authorization_code, client_credentials |
-
-### Paso 2: Reiniciar el servidor
+Para que la aplicación pueda usar OAuth2, necesitas registrarla mediante variables de entorno:
 
 ```bash
-docker-compose down
-docker-compose up --build
+# Configurar cliente OAuth2
+OAUTH2_CLIENTS=CINE_PLATFORM,TRANSCRIBERAPP
+
+# Cliente 1
+CINE_PLATFORM_SECRET=mi-secreto-seguro
+CINE_PLATFORM_REDIRECT_URI=http://localhost:3000/oauth/callback
+
+# Cliente 2
+TRANSCRIBERAPP_SECRET=otra-secreto
+TRANSCRIBERAPP_REDIRECT_URI=http://localhost:9000/oauth/callback
 ```
 
----
-
-## 👤 Añadir nuevos usuarios
-
-### Mediante API REST
-
-```bash
-curl -X POST http://localhost:8080/user \
-  -H "Content-Type: application/json" \
-  -d '{
-    "username": "juan",
-    "password": "contraseña123",
-    "email": "juan@ejemplo.com",
-    "app": "mi-aplicacion",
-    "role": "USER"
-  }'
-```
-
-### Explicación de campos
-
-| Campo | Descripción | Valores posibles |
-|-------|-------------|------------------|
-| `username` | Nombre de usuario | Cualquier texto |
-| `password` | Contraseña | Cualquier texto |
-| `email` | Correo electrónico | Formato email |
-| `app` | Aplicación a la que pertenece | El client-id configurado |
-| `role` | Rol del usuario | USER, ADMIN |
-
----
-
-## 🔗 Cómo usar OAuth2 en la aplicación
-
-### Flujo Authorization Code (para apps web)
+### Flujo Authorization Code
 
 **1. Redirige al usuario a:**
 
@@ -215,7 +181,7 @@ curl -X POST http://localhost:8080/oauth2/token \
 }
 ```
 
-### Flujo Client Credentials (M2M - máquina a máquina)
+### Flujo Client Credentials (M2M)
 
 Sin usuario, solo para comunicación entre servicios:
 
@@ -231,8 +197,7 @@ curl -X POST http://localhost:8080/oauth2/token \
 ## 🐳 Docker Compose
 
 El archivo `docker-compose.yml` incluye:
-
-- **OAuth2Server** - Puerto 8080 (dev) / 8443 (prod)
+- **OAuth2Server** - Puerto 8080
 - **PostgreSQL** - Puerto 5432
 
 ### Comandos útiles
@@ -257,7 +222,7 @@ docker-compose down
 | `/oauth2/authorize` | GET | Iniciar login OAuth2 |
 | `/oauth2/token` | POST | Obtener tokens |
 | `/login` | GET/POST | Página de login |
-| `/user/me` | GET | info del usuario actual |
+| `/user/me` | GET | Info del usuario actual |
 | `/user` | POST | Crear usuario |
 
 ---
@@ -281,25 +246,27 @@ mvn verify
 - Prueba con las credenciales por defecto: admin / admin123
 
 **Error de redirect_uri**
-- Asegúrate de que la URL de callback está registrada en `application-dev.properties`
+- Asegúrate de que la URL de callback está configurada mediante variables de entorno
 
 **Error de conexión a PostgreSQL**
 - Verifica que el contenedor de PostgreSQL está corriendo
-- Comprueba las credenciales en `application-dev.properties`
+- Comprueba las credenciales en las variables de entorno
 
 ---
+
 ## Documentación extendida
-- [COMANDOS](https://github.com/FelixMarin/OAuth2Server/blob/main/doc/COMMANDS.md)
-- [ENDPOINTS](https://github.com/FelixMarin/OAuth2Server/blob/main/doc/ENDPOINTS.md)
-- [MANUAL](https://github.com/FelixMarin/OAuth2Server/blob/main/doc/MANUAL.md)
-- [REGISTRAR APLICACIÓN](https://github.com/FelixMarin/OAuth2Server/blob/main/doc/REGSITRAR_NUEVA_APLICACION.md)
+- [COMMANDS](doc/COMMANDS.md)
+- [ENDPOINTS](doc/ENDPOINTS.md)
+- [MANUAL](doc/MANUAL.md)
+- [REGISTRAR APLICACIÓN](doc/REGSITRAR_NUEVA_APLICACION.md)
+
 ---
 
 ## ℹ️ Notas
 
 - La base de datos es **PostgreSQL** (no H2)
-- Los tokens JWT se firman con una clave configurada en las propiedades
-- Para producción, configura SSL en `application-prod.properties`
+- Los tokens JWT se firman con una clave configurada en las variables de entorno
+- La configuración sensible se gestiona mediante variables de entorno (no hardcoded)
 
 ---
 
