@@ -1,7 +1,6 @@
 package com.oauth.config;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 
 import com.oauth.infrastructure.service.ApplicationAuthenticationDetailsSource;
@@ -30,9 +29,8 @@ import java.util.Arrays;
 
 @Configuration
 @EnableWebSecurity
+@Slf4j
 public class SecurityConfig {
-
-    private static final Logger log = LoggerFactory.getLogger(SecurityConfig.class);
 
     // Dependencias necesarias
     private final ApplicationAuthenticationDetailsSource applicationAuthenticationDetailsSource;

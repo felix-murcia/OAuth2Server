@@ -6,30 +6,23 @@ import com.nimbusds.jose.jwk.source.ImmutableJWKSet;
 import com.nimbusds.jose.jwk.source.JWKSource;
 import com.nimbusds.jose.proc.SecurityContext;
 
+import com.oauth.adapters.output.persistence.ApplicationRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.oauth2.core.AuthorizationGrantType;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.jwt.JwtEncoder;
 import org.springframework.security.oauth2.jwt.NimbusJwtEncoder;
-import org.springframework.security.oauth2.server.authorization.client.InMemoryRegisteredClientRepository;
-import org.springframework.security.oauth2.server.authorization.client.RegisteredClient;
 import org.springframework.security.oauth2.server.authorization.client.RegisteredClientRepository;
 import org.springframework.security.oauth2.server.authorization.config.annotation.web.configuration.OAuth2AuthorizationServerConfiguration;
 import org.springframework.security.oauth2.server.authorization.settings.AuthorizationServerSettings;
-import org.springframework.security.oauth2.server.authorization.settings.ClientSettings;
-import org.springframework.security.oauth2.server.authorization.settings.TokenSettings;
 
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
-import java.time.Duration;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.UUID;
 
 @Configuration
@@ -49,87 +42,10 @@ public class OAuth2AuthorizationServer {
     }
 
     @Bean
-    public RegisteredClientRepository registeredClientRepository(PasswordEncoder passwordEncoder) {
-        List<RegisteredClient> clients = new ArrayList<>();
-        
-        // Obtener los prefijos de clientes desde variable de entorno
-        var clientsConfig = System.getenv("OAUTH2_CLIENTS");
-        log.info("=== CARGANDO CLIENTES OAUTH2 ===");
-        log.info("OAUTH2_CLIENTS env: {}", clientsConfig);
-        
-        if (clientsConfig != null && !clientsConfig.isBlank()) {
-            var prefixes = clientsConfig.split(",");
-            log.info("Prefijos encontrados: {}", String.join(", ", prefixes));
-            for (var prefix : prefixes) {
-                var trimmedPrefix = prefix.trim();
-                if (!trimmedPrefix.isEmpty()) {
-                    log.info("Procesando prefijo: '{}' -> client_id generado: '{}'", trimmedPrefix, trimmedPrefix.toLowerCase().replace('_', '-'));
-                    addClientIfConfigured(clients, passwordEncoder, trimmedPrefix);
-                }
-            }
-        } else {
-            log.warn("OAUTH2_CLIENTS no está configurado o está vacío");
-        }
-        
-        if (clients.isEmpty()) {
-            log.error("No OAuth2 clients configured. Set environment variable OAUTH2_CLIENTS with comma-separated client prefixes (e.g., CINE_PLATFORM,TRANSCRIBERAPP)");
-            throw new IllegalStateException("No OAuth2 clients configured");
-        }
-        
-        log.info("=== RESUMEN: {} clientes OAuth2 registrados ===", clients.size());
-        for (var client : clients) {
-            log.info("  - client_id: '{}'", client.getClientId());
-        }
-        return new InMemoryRegisteredClientRepository(clients);
-    }
-
-    private void addClientIfConfigured(List<RegisteredClient> clients, PasswordEncoder passwordEncoder, String prefix) {
-        var secret = System.getenv(prefix + "_SECRET");
-        var redirectUri = System.getenv(prefix + "_REDIRECT_URI");
-        var clientId = prefix.toLowerCase().replace('_', '-');
-        
-        log.info("  Variables para '{}': {}_SECRET={}, {}_REDIRECT_URI={}", 
-            clientId, prefix, secret != null ? "(configurada)" : "(NO CONFIGURADA)", 
-            prefix, redirectUri != null ? "(configurada)" : "(NO CONFIGURADA)");
-        
-        if (secret != null && redirectUri != null && !secret.isBlank() && !redirectUri.isBlank()) {
-            clients.add(createRegisteredClient(clientId, secret, redirectUri, passwordEncoder));
-            log.info("  ✓ Cliente '{}' REGISTRADO correctamente", clientId);
-        } else {
-            log.warn("  ✗ Cliente '{}' NO REGISTRADO: faltan variables de entorno", clientId);
-            if (secret == null || secret.isBlank()) {
-                log.warn("    - Falta {}_SECRET", prefix);
-            }
-            if (redirectUri == null || redirectUri.isBlank()) {
-                log.warn("    - Falta {}_REDIRECT_URI", prefix);
-            }
-        }
-    }
-
-    private RegisteredClient createRegisteredClient(String clientId, String secret, String redirectUri, 
-                                                   PasswordEncoder passwordEncoder) {
-        return RegisteredClient.withId(UUID.randomUUID().toString())
-                .clientId(clientId)
-                .clientSecret(passwordEncoder.encode(secret))
-                .authorizationGrantType(AuthorizationGrantType.AUTHORIZATION_CODE)
-                .authorizationGrantType(AuthorizationGrantType.REFRESH_TOKEN)
-                .authorizationGrantType(AuthorizationGrantType.CLIENT_CREDENTIALS)
-                .redirectUri(redirectUri)
-                .scope("openid")
-                .scope("profile")
-                .scope("email")
-                .scope("read")
-                .scope("write")
-                .clientSettings(ClientSettings.builder()
-                        .requireAuthorizationConsent(false)
-                        .requireProofKey(false)
-                        .build())
-                .tokenSettings(TokenSettings.builder()
-                        .accessTokenTimeToLive(Duration.ofSeconds(accessTokenValiditySeconds))
-                        .refreshTokenTimeToLive(Duration.ofSeconds(refreshTokenValiditySeconds))
-                        .reuseRefreshTokens(false)
-                        .build())
-                .build();
+    public RegisteredClientRepository registeredClientRepository(ApplicationRepository applicationRepository,
+                                                                  PasswordEncoder passwordEncoder) {
+        return new JpaRegisteredClientRepository(applicationRepository, passwordEncoder,
+                accessTokenValiditySeconds, refreshTokenValiditySeconds);
     }
 
     @Bean
