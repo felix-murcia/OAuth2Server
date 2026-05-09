@@ -140,6 +140,14 @@ VALUES (
 
 Al arrancar la aplicación, Flyway aplica la migración y el cliente queda registrado automáticamente. No es necesario reiniciar ni cambiar ningún fichero de código.
 
+### Clientes registrados
+
+| Aplicación | `client_id` | Callback (desarrollo) | Migración |
+|------------|-------------|----------------------|-----------|
+| cine-platform | `cine-platform` | `http://localhost:5000/oauth/callback` | V2 |
+| transcriberapp | `transcriberapp` | `http://localhost:9000/oauth/callback` | V2 |
+| empresa-web | `empresa-web` | `http://localhost:8001/oauth/callback` | V7 |
+
 ### Flujo Authorization Code
 
 **1. Redirige al usuario a:**
@@ -248,7 +256,7 @@ mvn verify
 - Prueba con las credenciales por defecto: admin / admin123
 
 **Error de redirect_uri**
-- Asegúrate de que la URL de callback está configurada mediante variables de entorno
+- Asegúrate de que la URL de callback en la petición coincide exactamente con la registrada en la tabla `applications`
 
 **Error de conexión a PostgreSQL**
 - Verifica que el contenedor de PostgreSQL está corriendo
