@@ -111,7 +111,7 @@ Consulta `docker-compose.prod.yml` para la configuración de producción.
 | `SPRING_DATASOURCE_URL` | URL de PostgreSQL | jdbc:postgresql://postgres:5432/oauth2_dev |
 | `SPRING_DATASOURCE_USERNAME` | Usuario de BD | oauth2_user |
 | `SPRING_DATASOURCE_PASSWORD` | Contraseña de BD | oauth2_dev_password |
-| `JWT_SIGNING_KEY` | Clave para firmar tokens JWT | clave-secreta |
+| `ISSUER_URL` | URL pública del servidor | https://auth.midominio.com |
 | `CORS_ALLOWED_ORIGINS` | Orígenes permitidos para CORS | http://localhost:3000 |
 
 ### Perfiles Spring
@@ -123,20 +123,22 @@ Consulta `docker-compose.prod.yml` para la configuración de producción.
 
 ## 🏢 Añadir una nueva aplicación
 
-Para que la aplicación pueda usar OAuth2, necesitas registrarla mediante variables de entorno:
+Los clientes OAuth2 se gestionan directamente en la base de datos a través de migraciones Flyway. No se requieren variables de entorno por cliente.
 
-```bash
-# Configurar cliente OAuth2
-OAUTH2_CLIENTS=APP1,APP2
+Crea un nuevo fichero de migración (p. ej. `V7__add_mi_app.sql`):
 
-# Cliente 1
-APP1_SECRET=mi-secreto-seguro
-APP1_REDIRECT_URI=http://localhost:3000/oauth/callback
-
-# Cliente 2
-APP2_SECRET=otra-secreto
-APP2_REDIRECT_URI=http://localhost:9000/oauth/callback
+```sql
+INSERT INTO applications (name, client_id, client_secret, redirect_uri, description)
+VALUES (
+    'mi-app',
+    'mi-app',
+    '{bcrypt}$2a$10$...',   -- secreto hasheado con BCrypt, o {noop}secreto-en-texto-plano para desarrollo
+    'https://miapp.com/oauth/callback',
+    'Mi nueva aplicación'
+);
 ```
+
+Al arrancar la aplicación, Flyway aplica la migración y el cliente queda registrado automáticamente. No es necesario reiniciar ni cambiar ningún fichero de código.
 
 ### Flujo Authorization Code
 
@@ -265,7 +267,8 @@ mvn verify
 ## ℹ️ Notas
 
 - La base de datos es **PostgreSQL** (no H2)
-- Los tokens JWT se firman con una clave configurada en las variables de entorno
+- Los tokens JWT se firman con un par de claves RSA generado en cada arranque
+- Los clientes OAuth2 se registran en la tabla `applications` de la BD; no se usan variables de entorno por cliente
 - La configuración sensible se gestiona mediante variables de entorno (no hardcoded)
 
 ---
