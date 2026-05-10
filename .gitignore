@@ -9,6 +9,7 @@ target/
 application-secrets.properties
 .env
 *.log
+*.sql
 
 ### STS ###
 .apt_generated
@@ -89,3 +90,6 @@ application-prod.properties
 backup-sensitive.sh
 docker-compose.prod.yml
 Dockerfile.prod
+
+CLAUDE.md
+.claude/

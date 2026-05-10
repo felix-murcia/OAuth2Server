@@ -194,6 +194,7 @@ public class SecurityConfig {
                 .authenticationDetailsSource(applicationAuthenticationDetailsSource)
                 // Usar el success handler por defecto de Spring (ya maneja SavedRequest)
                 .successHandler(new SavedRequestAwareAuthenticationSuccessHandler())
+                .failureUrl("/login?error")
                 .permitAll()
             )
             .logout(logout -> logout

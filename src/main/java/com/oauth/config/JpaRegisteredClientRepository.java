@@ -33,7 +33,7 @@ public class JpaRegisteredClientRepository implements RegisteredClientRepository
 
     @Override
     public void save(RegisteredClient registeredClient) {
-        throw new UnsupportedOperationException("Use DB migrations to register clients");
+        // Secrets are managed via DB migrations; encoding upgrades are intentionally ignored
     }
 
     @Override
