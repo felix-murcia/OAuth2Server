@@ -1,74 +1,70 @@
 package com.oauth.infrastructure.service
 
-import com.oauth.domain.model.UserEntity
-import com.oauth.adapters.output.persistence.UserEntityRepository
+import com.oauth.domain.UserDomain
+import com.oauth.application.out.persistence.UserRepositoryPort
+import com.oauth.application.service.UserEntityService
 import spock.lang.Specification
+import java.time.Instant
 
 class UserEntityServiceSpec extends Specification {
 
-    UserEntityRepository userEntityRepository
+    UserRepositoryPort userRepositoryPort
     UserEntityService userEntityService
 
     def setup() {
-        userEntityRepository = Mock(UserEntityRepository)
-        userEntityService = new UserEntityService(userEntityRepository)
+        userRepositoryPort = Mock(UserRepositoryPort)
+        userEntityService = new UserEntityService(userRepositoryPort)
     }
 
-    def "findUserByUsername returns user when user exists"() {
+    def "findByUsername returns user when user exists"() {
         given:
         String username = "admin"
-        UserEntity user = new UserEntity()
-        user.setUsername(username)
-        user.setEmail("admin@oauth.net")
-        user.setPassword("hashedPassword")
+        UserDomain user = new UserDomain(1L, username, "hashedPassword", "admin@oauth.net", "Admin User", "ROLE_ADMIN", true, true, true, true, Instant.now().toString(), Instant.now().toString())
 
         when:
-        Optional<UserEntity> result = userEntityService.findUserByUsername(username)
+        Optional<UserDomain> result = userEntityService.findByUsername(username)
 
         then:
-        1 * userEntityRepository.findByUsername(username) >> Optional.of(user)
+        1 * userRepositoryPort.findByUsername(username) >> Optional.of(user)
         result.isPresent()
-        result.get().getUsername() == username
+        result.get().username() == username
     }
 
-    def "findUserByUsername returns empty when user does not exist"() {
+    def "findByUsername returns empty when user does not exist"() {
         given:
         String username = "nonexistent"
 
         when:
-        Optional<UserEntity> result = userEntityService.findUserByUsername(username)
+        Optional<UserDomain> result = userEntityService.findByUsername(username)
 
         then:
-        1 * userEntityRepository.findByUsername(username) >> Optional.empty()
+        1 * userRepositoryPort.findByUsername(username) >> Optional.empty()
         !result.isPresent()
     }
 
-    def "findUserByEmail returns user when email exists"() {
+    def "findByEmail returns user when email exists"() {
         given:
         String email = "admin@oauth.net"
-        UserEntity user = new UserEntity()
-        user.setUsername("admin")
-        user.setEmail(email)
-        user.setPassword("hashedPassword")
+        UserDomain user = new UserDomain(1L, "admin", "hashedPassword", email, "Admin User", "ROLE_ADMIN", true, true, true, true, Instant.now().toString(), Instant.now().toString())
 
         when:
-        Optional<UserEntity> result = userEntityService.findUserByEmail(email)
+        Optional<UserDomain> result = userEntityService.findByEmail(email)
 
         then:
-        1 * userEntityRepository.findByEmail(email) >> Optional.of(user)
+        1 * userRepositoryPort.findByEmail(email) >> Optional.of(user)
         result.isPresent()
-        result.get().getEmail() == email
+        result.get().email() == email
     }
 
-    def "findUserByEmail returns empty when email does not exist"() {
+    def "findByEmail returns empty when email does not exist"() {
         given:
         String email = "nonexistent@example.com"
 
         when:
-        Optional<UserEntity> result = userEntityService.findUserByEmail(email)
+        Optional<UserDomain> result = userEntityService.findByEmail(email)
 
         then:
-        1 * userEntityRepository.findByEmail(email) >> Optional.empty()
+        1 * userRepositoryPort.findByEmail(email) >> Optional.empty()
         !result.isPresent()
     }
 }

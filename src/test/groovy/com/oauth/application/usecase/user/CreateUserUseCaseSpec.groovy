@@ -1,69 +1,45 @@
 package com.oauth.application.usecase.user
 
-import com.oauth.domain.exception.UserPasswordException
-import com.oauth.domain.model.Role
-import com.oauth.domain.model.UserEntity
-import com.oauth.domain.ports.in.role.RoleServicePort
-import com.oauth.domain.ports.in.usecase.user.CreateUserUseCasePort
-import com.oauth.domain.ports.in.user.UserServicePort
-import com.oauth.domain.ports.out.security.PasswordEncoderPort
+import com.oauth.domain.UserDomain
+import com.oauth.application.out.persistence.CreateUserRepositoryPort
+import com.oauth.application.service.CreateUserService
 import spock.lang.Specification
+import java.time.Instant
 
 class CreateUserUseCaseSpec extends Specification {
 
-    UserServicePort userService
-    RoleServicePort roleService
-    PasswordEncoderPort passwordEncoder
-    CreateUserUseCase createUserUseCase
+    CreateUserRepositoryPort createUserRepositoryPort
+    CreateUserService createUserService
 
     def setup() {
-        userService = Mock(UserServicePort)
-        roleService = Mock(RoleServicePort)
-        passwordEncoder = Mock(PasswordEncoderPort)
-        createUserUseCase = new CreateUserUseCase(userService, roleService, passwordEncoder)
+        createUserRepositoryPort = Mock(CreateUserRepositoryPort)
+        createUserService = new CreateUserService(createUserRepositoryPort)
     }
 
-    def 'execute throws UserPasswordException when passwords do not match'() {
-        when:
-        createUserUseCase.execute('testuser', 'test@example.com', 'Password123', 'DifferentPass', 'Test User').get()
-
-        then:
-        def ex = thrown(Exception)
-        ex.cause instanceof UserPasswordException
-    }
-
-    def 'execute creates user with valid credentials'() {
+    def 'execute creates user and returns UserDomain'() {
         given:
-        Role userRole = new Role('ROLE_USER', 'Usuario estándar')
-        UserEntity savedUser = new UserEntity()
-        savedUser.setId(1L)
-        savedUser.setUsername('testuser')
-        savedUser.setEmail('test@example.com')
-        savedUser.setFullName('Test User')
+        UserDomain user = new UserDomain(null, "testuser", "Password123", "test@example.com", "Test User", "ROLE_USER", true, true, true, true, Instant.now().toString(), Instant.now().toString())
+        UserDomain savedUser = new UserDomain(1L, "testuser", "Password123", "test@example.com", "Test User", "ROLE_USER", true, true, true, true, Instant.now().toString(), Instant.now().toString())
 
         when:
-        def result = createUserUseCase.execute('testuser', 'test@example.com', 'Password123', 'Password123', 'Test User').get()
+        def result = createUserService.execute(user)
 
         then:
-        1 * passwordEncoder.encode('Password123') >> 'encodedPassword'
-        1 * roleService.findOrCreateRole('ROLE_USER', 'Usuario estándar') >> userRole
-        1 * userService.save(_) >> savedUser
-        result.username == 'testuser'
+        1 * createUserRepositoryPort.save(user) >> savedUser
+        result.id() == 1L
+        result.username() == 'testuser'
     }
 
-    def 'execute throws exception when username already exists'() {
+    def 'execute propagates exceptions from repository'() {
         given:
-        Role userRole = new Role('ROLE_USER', 'Usuario estándar')
-        
+        UserDomain user = new UserDomain(null, "existinguser", "Password123", "test@example.com", "Test User", "ROLE_USER", true, true, true, true, Instant.now().toString(), Instant.now().toString())
+
         when:
-        createUserUseCase.execute('existinguser', 'test@example.com', 'Password123', 'Password123', 'Test User').get()
+        createUserService.execute(user)
 
         then:
-        1 * passwordEncoder.encode(_) >> 'encodedPassword'
-        1 * roleService.findOrCreateRole('ROLE_USER', _) >> userRole
-        1 * userService.save(_) >> { throw new org.springframework.dao.DataIntegrityViolationException('Duplicate key') }
-        
-        def ex = thrown(Exception)
-        ex.cause != null
+        1 * createUserRepositoryPort.save(user) >> { throw new RuntimeException('Duplicate') }
+        def ex = thrown(RuntimeException)
+        ex.message == 'Duplicate'
     }
 }
