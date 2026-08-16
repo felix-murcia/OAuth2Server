@@ -1,4 +1,4 @@
-package com.oauth.application.in.role;
+package com.oauth.application.in;
 
 import java.util.Optional;
 

@@ -4,7 +4,7 @@ import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 
-import com.oauth.application.in.application.ApplicationUseCase;
+import com.oauth.application.in.ApplicationUseCase;
 import com.oauth.domain.ApplicationDomain;
 
 /**

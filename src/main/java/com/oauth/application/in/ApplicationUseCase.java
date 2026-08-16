@@ -1,4 +1,4 @@
-package com.oauth.application.in.application;
+package com.oauth.application.in;
 
 import java.util.Optional;
 

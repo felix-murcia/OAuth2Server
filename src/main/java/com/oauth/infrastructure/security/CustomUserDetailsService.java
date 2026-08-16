@@ -1,17 +1,19 @@
-package com.oauth.infrastructure.output.security;
+package com.oauth.infrastructure.security;
 
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.stereotype.Service;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import java.util.List;
 
-import com.oauth.application.in.user.GetUserUseCase;
-import com.oauth.application.in.application.ApplicationUseCase;
-import com.oauth.application.in.user.UserApplicationUseCase;
+import com.oauth.application.in.ApplicationUseCase;
+import com.oauth.application.in.GetUserUseCase;
+import com.oauth.application.in.UserApplicationUseCase;
 import com.oauth.domain.UserDomain;
 
+@Service
 public class CustomUserDetailsService implements UserDetailsService {
 
         private final GetUserUseCase getUserUseCase;

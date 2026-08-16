@@ -5,7 +5,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.ProviderManager;
 
-import com.oauth.infrastructure.output.security.AppAwareAuthenticationProvider;
+import com.oauth.infrastructure.security.AppAwareAuthenticationProvider;
 
 @Configuration
 public class AuthenticationManagerConfig {

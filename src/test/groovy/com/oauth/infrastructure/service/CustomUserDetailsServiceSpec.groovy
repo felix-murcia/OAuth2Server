@@ -3,10 +3,10 @@ package com.oauth.infrastructure.service
 import com.oauth.domain.ApplicationDomain
 import com.oauth.domain.UserDomain
 import com.oauth.domain.UserApplicationDomain
-import com.oauth.application.in.user.GetUserUseCase
-import com.oauth.application.in.application.ApplicationUseCase
-import com.oauth.application.in.user.UserApplicationUseCase
-import com.oauth.infrastructure.output.security.CustomUserDetailsService
+import com.oauth.application.in.GetUserUseCase
+import com.oauth.application.in.ApplicationUseCase
+import com.oauth.application.in.UserApplicationUseCase
+import com.oauth.infrastructure.security.CustomUserDetailsService
 import org.springframework.security.core.userdetails.UsernameNotFoundException
 import spock.lang.Specification
 import java.time.Instant

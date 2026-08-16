@@ -1,10 +1,10 @@
-package com.oauth.infrastructure.output.database;
+package com.oauth.infrastructure.output.database.dto;
 
 /**
  * Value object para detalles de autenticación específicos de aplicación
  * Record inmutable para clientId
  */
-public record ApplicationDetails(String clientId) {
+public record ApplicationDetailsDTO(String clientId) {
 
     @Override
     public String toString() {

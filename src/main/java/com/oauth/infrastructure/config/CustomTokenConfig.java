@@ -14,11 +14,11 @@ import com.oauth.infrastructure.input.UserServiceAdapter;
 
 @Configuration
 @Slf4j
-public class CustomTokenEnhancer {
+public class CustomTokenConfig {
 
     private final UserServiceAdapter userServiceAdapter;
 
-    public CustomTokenEnhancer(UserServiceAdapter userServiceAdapter) {
+    public CustomTokenConfig(UserServiceAdapter userServiceAdapter) {
         this.userServiceAdapter = userServiceAdapter;
     }
 

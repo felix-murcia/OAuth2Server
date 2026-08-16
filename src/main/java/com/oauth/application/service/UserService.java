@@ -2,15 +2,15 @@ package com.oauth.application.service;
 
 import java.util.Optional;
 
-import com.oauth.application.in.user.GetUserUseCase;
+import com.oauth.application.in.GetUserUseCase;
 import com.oauth.application.out.persistence.UserRepositoryPort;
 import com.oauth.domain.UserDomain;
 
-public class UserEntityService implements GetUserUseCase {
+public class UserService implements GetUserUseCase {
 
     private final UserRepositoryPort userRepositoryPort;
 
-    public UserEntityService(UserRepositoryPort userRepositoryPort) {
+    public UserService(UserRepositoryPort userRepositoryPort) {
         this.userRepositoryPort = userRepositoryPort;
     }
 

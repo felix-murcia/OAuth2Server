@@ -4,8 +4,8 @@ import com.oauth.infrastructure.input.rest.dto.CreateUserDto
 import com.oauth.infrastructure.input.rest.dto.GetUserDto
 import com.oauth.infrastructure.input.rest.mapper.UserDtoMapper
 import com.oauth.domain.UserDomain
-import com.oauth.application.in.user.CreateUserUseCase
-import com.oauth.application.in.user.GetUserUseCase
+import com.oauth.application.in.CreateUserUseCase
+import com.oauth.application.in.GetUserUseCase
 import spock.lang.Specification
 import java.time.Instant
 

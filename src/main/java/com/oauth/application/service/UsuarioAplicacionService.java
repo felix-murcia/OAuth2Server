@@ -3,10 +3,11 @@ package com.oauth.application.service;
 import java.util.List;
 import java.util.Optional;
 
-import com.oauth.application.in.user.UserApplicationUseCase;
+import com.oauth.application.in.UserApplicationUseCase;
 import com.oauth.application.out.persistence.UserApplicationRepositoryPort;
 import com.oauth.domain.UserApplicationDomain;
 
+@org.springframework.stereotype.Service
 public class UsuarioAplicacionService implements UserApplicationUseCase {
 
     private final UserApplicationRepositoryPort userApplicationRepositoryPort;

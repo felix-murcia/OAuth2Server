@@ -1,4 +1,4 @@
-package com.oauth.application.in.user;
+package com.oauth.application.in;
 
 import com.oauth.domain.UserDomain;
 

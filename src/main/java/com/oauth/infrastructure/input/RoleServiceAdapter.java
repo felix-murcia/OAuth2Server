@@ -4,7 +4,7 @@ import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 
-import com.oauth.application.in.role.RoleUseCase;
+import com.oauth.application.in.RoleUseCase;
 import com.oauth.domain.RoleDomain;
 
 @Service

@@ -1,4 +1,4 @@
-package com.oauth.infrastructure.output.security;
+package com.oauth.infrastructure.security;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,7 +13,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
-import com.oauth.infrastructure.output.database.ApplicationDetails;
+import com.oauth.infrastructure.output.database.dto.ApplicationDetailsDTO;
 
 @Component
 public class AppAwareAuthenticationProvider implements AuthenticationProvider {
@@ -96,7 +96,7 @@ public class AppAwareAuthenticationProvider implements AuthenticationProvider {
         Object details = authentication.getDetails();
 
         // Caso 1: Es ApplicationDetails
-        if (details instanceof ApplicationDetails appDetails) {
+        if (details instanceof ApplicationDetailsDTO appDetails) {
             var clientId = appDetails.clientId();
             log.debug("Extracted clientId from ApplicationDetails");
             return clientId;

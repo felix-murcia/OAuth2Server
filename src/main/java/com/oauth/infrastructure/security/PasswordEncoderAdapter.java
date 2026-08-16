@@ -1,4 +1,4 @@
-package com.oauth.infrastructure.output.security;
+package com.oauth.infrastructure.security;
 
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;

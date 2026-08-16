@@ -2,18 +2,18 @@ package com.oauth.infrastructure.service
 
 import com.oauth.domain.UserDomain
 import com.oauth.application.out.persistence.UserRepositoryPort
-import com.oauth.application.service.UserEntityService
+import com.oauth.application.service.UserService
 import spock.lang.Specification
 import java.time.Instant
 
-class UserEntityServiceSpec extends Specification {
+class UserServiceSpec extends Specification {
 
     UserRepositoryPort userRepositoryPort
-    UserEntityService userEntityService
+    UserService userEntityService
 
     def setup() {
         userRepositoryPort = Mock(UserRepositoryPort)
-        userEntityService = new UserEntityService(userRepositoryPort)
+        userEntityService = new UserService(userRepositoryPort)
     }
 
     def "findByUsername returns user when user exists"() {

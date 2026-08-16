@@ -7,8 +7,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.oauth.application.in.user.CreateUserUseCase;
-import com.oauth.application.in.user.GetUserUseCase;
+import com.oauth.application.in.CreateUserUseCase;
+import com.oauth.application.in.GetUserUseCase;
 import com.oauth.infrastructure.input.rest.dto.CreateUserDto;
 import com.oauth.infrastructure.input.rest.dto.GetUserDto;
 import com.oauth.infrastructure.input.rest.mapper.UserDtoMapper;
