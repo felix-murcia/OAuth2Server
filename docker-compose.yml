@@ -21,7 +21,6 @@ services:
       start_period: 10s
     networks:
       - oauth-network
-      - cine-network
     restart: unless-stopped
 
   # ===========================================
@@ -120,7 +119,6 @@ services:
     restart: unless-stopped
     networks:
       - oauth-network
-      - cine-network
 
 volumes:
   postgres_data:
@@ -129,6 +127,3 @@ volumes:
 networks:
   oauth-network:
     driver: bridge
-  cine-network:
-    external: "true"
-    name: cine-network

@@ -1,45 +1,44 @@
 package com.oauth.infrastructure.service
 
-import com.oauth.domain.model.Application
-import com.oauth.domain.model.Role
-import com.oauth.domain.model.UserEntity
-import com.oauth.domain.model.UsuarioAplicacion
-import com.oauth.adapters.output.persistence.UserEntityRepository
+import com.oauth.domain.ApplicationDomain
+import com.oauth.domain.UserDomain
+import com.oauth.domain.UserApplicationDomain
+import com.oauth.application.in.GetUserUseCase
+import com.oauth.application.in.ApplicationUseCase
+import com.oauth.application.in.UserApplicationUseCase
+import com.oauth.infrastructure.security.CustomUserDetailsService
 import org.springframework.security.core.userdetails.UsernameNotFoundException
 import spock.lang.Specification
+import java.time.Instant
 
 class CustomUserDetailsServiceSpec extends Specification {
 
-    UserEntityRepository userEntityRepository
-    ApplicationService applicationService
-    UsuarioAplicacionService usuarioAplicacionService
+    GetUserUseCase getUserUseCase
+    ApplicationUseCase applicationUseCase
+    UserApplicationUseCase userApplicationUseCase
     CustomUserDetailsService customUserDetailsService
 
     def setup() {
-        userEntityRepository = Mock(UserEntityRepository)
-        applicationService = Mock(ApplicationService)
-        usuarioAplicacionService = Mock(UsuarioAplicacionService)
+        getUserUseCase = Mock(GetUserUseCase)
+        applicationUseCase = Mock(ApplicationUseCase)
+        userApplicationUseCase = Mock(UserApplicationUseCase)
         customUserDetailsService = new CustomUserDetailsService(
-            userEntityRepository, 
-            applicationService, 
-            usuarioAplicacionService
+            getUserUseCase, 
+            applicationUseCase, 
+            userApplicationUseCase
         )
     }
 
     def "loadUserByUsername returns user when user exists"() {
         given:
         String username = "admin"
-        UserEntity user = new UserEntity()
-        user.setUsername(username)
-        user.setEmail("admin@oauth.net")
-        user.setPassword("hashedPassword")
-        user.setRoles(Set.of(new Role('ROLE_ADMIN', 'Administrador')))
+        UserDomain user = new UserDomain(1L, username, "hashedPassword", "admin@oauth.net", "Admin User", "ROLE_ADMIN", true, true, true, true, Instant.now().toString(), Instant.now().toString())
 
         when:
         def result = customUserDetailsService.loadUserByUsername(username)
 
         then:
-        1 * userEntityRepository.findByUsername(username) >> Optional.of(user)
+        1 * getUserUseCase.findByUsername(username) >> Optional.of(user)
         result.getUsername() == username
     }
 
@@ -51,7 +50,7 @@ class CustomUserDetailsServiceSpec extends Specification {
         customUserDetailsService.loadUserByUsername(username)
 
         then:
-        1 * userEntityRepository.findByUsername(username) >> Optional.empty()
+        1 * getUserUseCase.findByUsername(username) >> Optional.empty()
         thrown(UsernameNotFoundException)
     }
 
@@ -59,24 +58,17 @@ class CustomUserDetailsServiceSpec extends Specification {
         given:
         String username = "admin"
         String appClientId = "cine-platform"
-        UserEntity user = new UserEntity()
-        user.setId(1L)
-        user.setUsername(username)
-        user.setEmail("admin@oauth.net")
-        user.setPassword("hashedPassword")
-        user.setRoles(Set.of(new Role('ROLE_ADMIN', 'Administrador')))
+        UserDomain user = new UserDomain(1L, username, "hashedPassword", "admin@oauth.net", "Admin User", "ROLE_ADMIN", true, true, true, true, Instant.now().toString(), Instant.now().toString())
         
-        Application app = new Application()
-        app.setId(1L)
-        app.setClientId(appClientId)
+        ApplicationDomain app = new ApplicationDomain(1L, appClientId, "secret", "Cine Platform", "Desc", "url", "client_credentials", "read", "3600", "7200", true, Instant.now().toString(), Instant.now().toString())
 
         when:
         def result = customUserDetailsService.loadUserByUsernameAndApplication(username, appClientId)
 
         then:
-        1 * userEntityRepository.findByUsername(username) >> Optional.of(user)
-        1 * applicationService.findByClientId(appClientId) >> Optional.of(app)
-        1 * usuarioAplicacionService.findByUsuarioIdAndApplicationId(1L, 1L) >> Optional.of(new UsuarioAplicacion())
+        1 * getUserUseCase.findByUsername(username) >> Optional.of(user)
+        1 * applicationUseCase.findByClientId(appClientId) >> Optional.of(app)
+        1 * userApplicationUseCase.findByUsuarioIdAndApplicationId(1L, 1L) >> Optional.of(new UserApplicationDomain(1L, user, app, java.time.LocalDateTime.now()))
         result.getUsername() == username
     }
 
@@ -84,22 +76,17 @@ class CustomUserDetailsServiceSpec extends Specification {
         given:
         String username = "admin"
         String appClientId = "cine-platform"
-        UserEntity user = new UserEntity()
-        user.setId(1L)
-        user.setUsername(username)
-        user.setEmail("admin@oauth.net")
+        UserDomain user = new UserDomain(1L, username, "hashedPassword", "admin@oauth.net", "Admin User", "ROLE_ADMIN", true, true, true, true, Instant.now().toString(), Instant.now().toString())
         
-        Application app = new Application()
-        app.setId(1L)
-        app.setClientId(appClientId)
+        ApplicationDomain app = new ApplicationDomain(1L, appClientId, "secret", "Cine Platform", "Desc", "url", "client_credentials", "read", "3600", "7200", true, Instant.now().toString(), Instant.now().toString())
 
         when:
         customUserDetailsService.loadUserByUsernameAndApplication(username, appClientId)
 
         then:
-        1 * userEntityRepository.findByUsername(username) >> Optional.of(user)
-        1 * applicationService.findByClientId(appClientId) >> Optional.of(app)
-        1 * usuarioAplicacionService.findByUsuarioIdAndApplicationId(1L, 1L) >> Optional.empty()
+        1 * getUserUseCase.findByUsername(username) >> Optional.of(user)
+        1 * applicationUseCase.findByClientId(appClientId) >> Optional.of(app)
+        1 * userApplicationUseCase.findByUsuarioIdAndApplicationId(1L, 1L) >> Optional.empty()
         thrown(UsernameNotFoundException)
     }
 
@@ -112,7 +99,7 @@ class CustomUserDetailsServiceSpec extends Specification {
         customUserDetailsService.loadUserByUsernameAndApplication(username, appClientId)
 
         then:
-        1 * userEntityRepository.findByUsername(username) >> Optional.empty()
+        1 * getUserUseCase.findByUsername(username) >> Optional.empty()
         thrown(UsernameNotFoundException)
     }
 
@@ -120,19 +107,17 @@ class CustomUserDetailsServiceSpec extends Specification {
         given:
         String username = "admin"
         String appClientId = "cine-platform"
-        UserEntity user = new UserEntity()
-        user.setId(1L)
+        UserDomain user = new UserDomain(1L, username, "hashedPassword", "admin@oauth.net", "Admin User", "ROLE_ADMIN", true, true, true, true, Instant.now().toString(), Instant.now().toString())
         
-        Application app = new Application()
-        app.setId(1L)
+        ApplicationDomain app = new ApplicationDomain(1L, appClientId, "secret", "Cine Platform", "Desc", "url", "client_credentials", "read", "3600", "7200", true, Instant.now().toString(), Instant.now().toString())
 
         when:
         def result = customUserDetailsService.isUserRegisteredInApplication(username, appClientId)
 
         then:
-        1 * userEntityRepository.findByUsername(username) >> Optional.of(user)
-        1 * applicationService.findByClientId(appClientId) >> Optional.of(app)
-        1 * usuarioAplicacionService.findByUsuarioIdAndApplicationId(1L, 1L) >> Optional.of(new UsuarioAplicacion())
+        1 * getUserUseCase.findByUsername(username) >> Optional.of(user)
+        1 * applicationUseCase.findByClientId(appClientId) >> Optional.of(app)
+        1 * userApplicationUseCase.findByUsuarioIdAndApplicationId(1L, 1L) >> Optional.of(new UserApplicationDomain(1L, user, app, java.time.LocalDateTime.now()))
         result == true
     }
 
@@ -140,19 +125,18 @@ class CustomUserDetailsServiceSpec extends Specification {
         given:
         String username = "admin"
         String appClientId = "cine-platform"
-        UserEntity user = new UserEntity()
-        user.setId(1L)
+        UserDomain user = new UserDomain(1L, username, "hashedPassword", "admin@oauth.net", "Admin User", "ROLE_ADMIN", true, true, true, true, Instant.now().toString(), Instant.now().toString())
         
-        Application app = new Application()
-        app.setId(1L)
+        ApplicationDomain app = new ApplicationDomain(1L, appClientId, "secret", "Cine Platform", "Desc", "url", "client_credentials", "read", "3600", "7200", true, Instant.now().toString(), Instant.now().toString())
+
 
         when:
         def result = customUserDetailsService.isUserRegisteredInApplication(username, appClientId)
 
         then:
-        1 * userEntityRepository.findByUsername(username) >> Optional.of(user)
-        1 * applicationService.findByClientId(appClientId) >> Optional.of(app)
-        1 * usuarioAplicacionService.findByUsuarioIdAndApplicationId(1L, 1L) >> Optional.empty()
+        1 * getUserUseCase.findByUsername(username) >> Optional.of(user)
+        1 * applicationUseCase.findByClientId(appClientId) >> Optional.of(app)
+        1 * userApplicationUseCase.findByUsuarioIdAndApplicationId(1L, 1L) >> Optional.empty()
         result == false
     }
 
@@ -165,7 +149,7 @@ class CustomUserDetailsServiceSpec extends Specification {
         def result = customUserDetailsService.isUserRegisteredInApplication(username, appClientId)
 
         then:
-        1 * userEntityRepository.findByUsername(username) >> Optional.empty()
+        1 * getUserUseCase.findByUsername(username) >> Optional.empty()
         result == false
     }
 }

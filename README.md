@@ -10,34 +10,32 @@ Este proyecto implementa **Arquitectura Hexagonal** (Ports and Adapters) para ma
 
 ```
 src/main/java/com/oauth/
-├── domain/                    # 🔵 NÚCLEO - Sin dependencias externas
-│   ├── exception/            # Excepciones del dominio
-│   ├── model/                # Entidades y value objects
-│   └── ports/                # Interfaces (contratos)
-│       └── in/               # Puertos de entrada
+├── domain/                    # 🔵 NÚCLEO (Domain) - Entidades puras y Records (Sin dependencias de frameworks)
 │
-├── application/              # 🟢 CASOS DE USO
-│   └── usecase/             # Implementaciones de use cases
+├── application/               # 🟢 CASOS DE USO (Application)
+│   ├── in/                    # Puertos de entrada (Interfaces que exponen los casos de uso)
+│   ├── out/                   # Puertos de salida (Interfaces como RepositoryPorts)
+│   └── service/               # Implementación agnóstica de los casos de uso
 │
-├── adapters/                 # 🟡 ADAPTADORES EXTERNOS
-│   ├── input/               # Adaptadores de entrada (Driven)
-│   │   └── rest/            # Controladores REST
-│   │
-│   └── output/              # Adaptadores de salida (Driving)
-│       ├── persistence/      # Repositorios JPA
-│       └── security/         # Adaptadores de seguridad
-│
-├── infrastructure/           # 🟠 INFRAESTRUCTURA
-│   └── service/             # Servicios específicos del framework
-│
-└── config/                   # 🔴 Configuración Spring
+├── infrastructure/            # 🟠 INFRAESTRUCTURA Y ADAPTADORES (Infrastructure)
+│   ├── config/                # Configuraciones de Spring, Flyway, y Beans
+│   ├── input/                 # Adaptadores "Driven" (Controladores REST y Service Adapters)
+│   ├── output/                # Adaptadores "Driving" (JPA Entities, adaptadores de DB concretos)
+│   └── security/              # Tokens JWT, Filtros HTTP, y CustomUserDetailsServices
 ```
+
+
 
 ### Principios aplicados
 - **Dominio limpio**: La lógica de negocio no depende de frameworks
 - **Puertos**: Interfaces que definen contratos entre capas
 - **Adaptadores**: Implementaciones concretas de los puertos
 - **Inversión de dependencias**: Las dependencias apuntan hacia el dominio
+
+### Refactorización y Limpieza Rigurosa (Implementado)
+- **Dominio y Aplicación Pura**: El núcleo no conoce `jakarta.servlet`, `@Entity` de JPA ni lógicas web. Las dependencias externas en Beans incompatibles se extrajeron.
+- **Seguridad segregada**: Todo el control de filtros web, extracción del Client ID, Detalles de autenticación explícitos, y OAuth2 Authorization Server operan estrictamente en `infrastructure/security` y `infrastructure/config`.
+- **Adaptación en la Persistencia y Enrutamiento**: El flujo JWT se mantiene mediante adaptadores de infraestructura para evitar contaminar la lectura del Access Token con base de datos durante la autorización.
 
 ---
 

@@ -1,45 +1,26 @@
-package com.oauth.domain.model
+package com.oauth.domain
 
 import spock.lang.Specification
+import java.time.Instant
 
-class UserEntitySpec extends Specification {
+class UserDomainSpec extends Specification {
 
-    def 'UserEntity can be created with username and email'() {
-        given:
-        UserEntity user = new UserEntity()
-        user.setUsername("testuser")
-        user.setEmail("test@example.com")
-        user.setPassword("password123")
-
-        expect:
-        user.getUsername() == "testuser"
-        user.getEmail() == "test@example.com"
-        user.getPassword() == "password123"
-    }
-
-    def 'UserEntity can have roles'() {
-        given:
-        UserEntity user = new UserEntity()
-        Role adminRole = new Role('ROLE_ADMIN', 'Administrator')
-        Role userRole = new Role('ROLE_USER', 'User')
-
+    def 'UserDomain cannot be created with null values'() {
         when:
-        user.setRoles(Set.of(adminRole, userRole))
+        new UserDomain(null, null, null, null, null, null, true, true, true, true, null, null)
 
         then:
-        user.getRoles().size() == 2
-        user.getRoles().contains(adminRole)
-        user.getRoles().contains(userRole)
+        thrown(IllegalArgumentException)
     }
 
-    def 'UserEntity defaults'() {
-        given:
-        UserEntity user = new UserEntity()
+    def 'UserDomain can be created with valid values'() {
+        when:
+        def user = new UserDomain(1L, "testuser", "password123", "test@example.com", "Test User", "ROLE_USER", true, true, true, true, Instant.now().toString(), Instant.now().toString())
 
-        expect:
-        user.getId() == null
-        user.getUsername() == null
-        user.getEmail() == null
-        user.getPassword() == null
+        then:
+        user.username() == "testuser"
+        user.email() == "test@example.com"
+        user.password() == "password123"
+        user.role() == "ROLE_USER"
     }
 }
