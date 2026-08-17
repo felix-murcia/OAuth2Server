@@ -19,7 +19,7 @@ public class UserDtoMapper {
                 user.username(),
                 user.fullName(),
                 user.email(),
-                Set.of(user.role()));
+                user.roles());
     }
 
     public UserDomain toUserDomain(CreateUserDto createUserDto) {
@@ -29,7 +29,7 @@ public class UserDtoMapper {
                 Optional.ofNullable(createUserDto.getPassword()).orElse(createUserDto.getPassword2()),
                 createUserDto.getEmail(),
                 createUserDto.getFullName(),
-                "ROLE_USER",
+                Set.of("ROLE_USER"),
                 true,
                 true,
                 true,

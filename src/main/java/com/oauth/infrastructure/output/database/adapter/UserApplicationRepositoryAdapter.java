@@ -93,14 +93,15 @@ public class UserApplicationRepositoryAdapter implements UserApplicationReposito
     }
 
     private UserDomain mapUser(UserJpaEntity entity) {
-        String roleStr = entity.getRoles().stream().map(RoleJpaEntity::getName).findFirst().orElse("ROLE_USER");
+        java.util.Set<String> rolesStr = entity.getRoles().stream().map(RoleJpaEntity::getName).collect(java.util.stream.Collectors.toSet());
+        if (rolesStr.isEmpty()) rolesStr = java.util.Set.of("ROLE_USER");
         return new UserDomain(
                 entity.getId(),
                 entity.getUsername(),
                 entity.getPassword(),
                 entity.getEmail(),
                 entity.getFullName() != null ? entity.getFullName() : "",
-                roleStr,
+                rolesStr,
                 entity.getEnabled() != null ? entity.getEnabled() : true,
                 true, true, true,
                 entity.getCreatedAt() != null ? entity.getCreatedAt().toString() : Instant.now().toString(),

@@ -1,6 +1,7 @@
 package com.oauth.domain;
 
 import java.util.Optional;
+import java.util.Set;
 
 public record UserDomain(
         Long id,
@@ -8,7 +9,7 @@ public record UserDomain(
         String password,
         String email,
         String fullName,
-        String role,
+        Set<String> roles,
         boolean enabled,
         boolean accountNonExpired,
         boolean accountNonLocked,
@@ -29,7 +30,7 @@ public record UserDomain(
         if (Optional.ofNullable(fullName).isEmpty()) {
             throw new IllegalArgumentException("Full name cannot be null or empty");
         }
-        if (Optional.ofNullable(role).isEmpty()) {
+        if (roles == null || roles.isEmpty()) {
             throw new IllegalArgumentException("Role cannot be null or empty");
         }
         if (Optional.ofNullable(createdAt).isEmpty()) {

@@ -59,10 +59,11 @@ public class UserRepositoryAdapter implements UserRepositoryPort, CreateUserRepo
     }
 
     private UserDomain toDomain(UserJpaEntity entity) {
-        String roleStr = entity.getRoles().stream()
+        Set<String> rolesStr = entity.getRoles().stream()
                 .map(RoleJpaEntity::getName)
-                .findFirst()
-                .orElse("ROLE_USER");
+                .collect(java.util.stream.Collectors.toSet());
+        if (rolesStr.isEmpty())
+            rolesStr = Set.of("ROLE_USER");
 
         return new UserDomain(
                 entity.getId(),
@@ -70,7 +71,7 @@ public class UserRepositoryAdapter implements UserRepositoryPort, CreateUserRepo
                 entity.getPassword(),
                 entity.getEmail(),
                 entity.getFullName() != null ? entity.getFullName() : "",
-                roleStr,
+                rolesStr,
                 entity.getEnabled() != null ? entity.getEnabled() : true,
                 true,
                 true,
@@ -90,14 +91,16 @@ public class UserRepositoryAdapter implements UserRepositoryPort, CreateUserRepo
         entity.setFullName(domain.fullName());
         entity.setEnabled(domain.enabled());
 
-        RoleJpaEntity roleOpt = roleRepository.findByName(domain.role())
-                .orElseGet(() -> {
-                    RoleJpaEntity r = new RoleJpaEntity();
-                    r.setName(domain.role());
-                    r.setDescription(domain.role());
-                    return roleRepository.save(r);
-                });
-        entity.setRoles(Set.of(roleOpt));
+        Set<RoleJpaEntity> roleEntities = domain.roles().stream()
+                .map(roleName -> roleRepository.findByName(roleName)
+                        .orElseGet(() -> {
+                            RoleJpaEntity r = new RoleJpaEntity();
+                            r.setName(roleName);
+                            r.setDescription(roleName);
+                            return roleRepository.save(r);
+                        }))
+                .collect(java.util.stream.Collectors.toSet());
+        entity.setRoles(roleEntities);
 
         return entity;
     }

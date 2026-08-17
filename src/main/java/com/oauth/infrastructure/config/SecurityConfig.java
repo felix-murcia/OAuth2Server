@@ -32,142 +32,140 @@ import java.util.Arrays;
 @Slf4j
 public class SecurityConfig {
 
-    private final ApplicationAuthenticationDetailsSource applicationAuthenticationDetailsSource;
-    private final ClientIdExtractorFilter clientIdExtractorFilter;
+        private final ApplicationAuthenticationDetailsSource applicationAuthenticationDetailsSource;
+        private final ClientIdExtractorFilter clientIdExtractorFilter;
 
-    public SecurityConfig(
-            ApplicationAuthenticationDetailsSource applicationAuthenticationDetailsSource,
-            ClientIdExtractorFilter clientIdExtractorFilter) {
-        this.applicationAuthenticationDetailsSource = applicationAuthenticationDetailsSource;
-        this.clientIdExtractorFilter = clientIdExtractorFilter;
-        log.debug("[SecurityConfig] Initialized");
-    }
-
-    @Bean
-    public StrictHttpFirewall httpFirewall() {
-        var firewall = new StrictHttpFirewall();
-        firewall.setAllowSemicolon(true);
-        firewall.setAllowUrlEncodedPercent(true);
-        firewall.setAllowUrlEncodedSlash(false);
-        firewall.setAllowBackSlash(false);
-        firewall.setAllowUrlEncodedDoubleSlash(false);
-        return firewall;
-    }
-
-    @Bean
-    @Order(0)
-    public FilterRegistrationBean<ForwardedHeaderFilter> forwardedHeaderFilter() {
-        FilterRegistrationBean<ForwardedHeaderFilter> registration = new FilterRegistrationBean<>();
-        registration.setFilter(new ForwardedHeaderFilter());
-        registration.setOrder(0);
-        return registration;
-    }
-
-    @Bean
-    public CorsConfigurationSource corsConfigurationSource() {
-        var configuration = new CorsConfiguration();
-
-        var allowedOriginsEnv = System.getenv("CORS_ALLOWED_ORIGINS");
-        if (allowedOriginsEnv == null || allowedOriginsEnv.isBlank()) {
-            throw new IllegalStateException("CORS_ALLOWED_ORIGINS environment variable is required");
+        public SecurityConfig(
+                        ApplicationAuthenticationDetailsSource applicationAuthenticationDetailsSource,
+                        ClientIdExtractorFilter clientIdExtractorFilter) {
+                this.applicationAuthenticationDetailsSource = applicationAuthenticationDetailsSource;
+                this.clientIdExtractorFilter = clientIdExtractorFilter;
+                log.debug("[SecurityConfig] Initialized");
         }
-        var allowedOrigins = allowedOriginsEnv.split(",");
 
-        log.info("[SecurityConfig] CORS allowed origins: {}", String.join(", ", allowedOrigins));
-        configuration.setAllowedOrigins(Arrays.asList(allowedOrigins));
-        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-        configuration.setAllowedHeaders(Arrays.asList(
-                "Authorization",
-                "Content-Type",
-                "X-Requested-With",
-                "X-CSRF-TOKEN",
-                "Accept"));
-        configuration.setExposedHeaders(Arrays.asList("X-CSRF-TOKEN"));
-        configuration.setAllowCredentials(true);
-        configuration.setMaxAge(3600L);
+        @Bean
+        public StrictHttpFirewall httpFirewall() {
+                var firewall = new StrictHttpFirewall();
+                firewall.setAllowSemicolon(true);
+                firewall.setAllowUrlEncodedPercent(true);
+                firewall.setAllowUrlEncodedSlash(false);
+                firewall.setAllowBackSlash(false);
+                firewall.setAllowUrlEncodedDoubleSlash(false);
+                return firewall;
+        }
 
-        var source = new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("/**", configuration);
-        return source;
-    }
+        @Bean
+        @Order(0)
+        public FilterRegistrationBean<ForwardedHeaderFilter> forwardedHeaderFilter() {
+                FilterRegistrationBean<ForwardedHeaderFilter> registration = new FilterRegistrationBean<>();
+                registration.setFilter(new ForwardedHeaderFilter());
+                registration.setOrder(0);
+                return registration;
+        }
 
-    @Bean
-    @Order(1)
-    @SuppressWarnings("deprecation")
-    public SecurityFilterChain authorizationServerSecurityFilterChain(HttpSecurity http) throws Exception {
-        OAuth2AuthorizationServerConfiguration.applyDefaultSecurity(http);
-        http.getConfigurer(OAuth2AuthorizationServerConfigurer.class)
-            .oidc(Customizer.withDefaults());
+        @Bean
+        public CorsConfigurationSource corsConfigurationSource() {
+                var configuration = new CorsConfiguration();
 
-        http.exceptionHandling(exceptions -> exceptions
-                .authenticationEntryPoint(new LoginUrlAuthenticationEntryPoint("/login"))
-        );
+                var allowedOriginsEnv = System.getenv("CORS_ALLOWED_ORIGINS");
+                if (allowedOriginsEnv == null || allowedOriginsEnv.isBlank()) {
+                        throw new IllegalStateException("CORS_ALLOWED_ORIGINS environment variable is required");
+                }
+                var allowedOrigins = allowedOriginsEnv.split(",");
 
-        log.debug("[SecurityConfig] OAuth2 Authorization Server configured");
-        return http.build();
-    }
+                log.info("[SecurityConfig] CORS allowed origins: {}", String.join(", ", allowedOrigins));
+                configuration.setAllowedOrigins(Arrays.asList(allowedOrigins));
+                configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+                configuration.setAllowedHeaders(Arrays.asList(
+                                "Authorization",
+                                "Content-Type",
+                                "X-Requested-With",
+                                "X-CSRF-TOKEN",
+                                "Accept"));
+                configuration.setExposedHeaders(Arrays.asList("X-CSRF-TOKEN"));
+                configuration.setAllowCredentials(true);
+                configuration.setMaxAge(3600L);
 
-    @Bean
-    @Order(2)
-    public SecurityFilterChain defaultSecurityFilterChain(HttpSecurity http) throws Exception {
-        http
-                .addFilterBefore(clientIdExtractorFilter,
-                        org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter.class)
-                .securityMatcher(
-                        "/",
-                        "/login",
-                        "/oauth2/login",
-                        "/logout",
-                        "/css/**",
-                        "/js/**",
-                        "/images/**",
-                        "/webjars/**",
-                        "/favicon.ico",
-                        "/error",
-                        "/invalid-application",
-                        "/h2-console/**",
-                        "/api/**",
-                        "/user/**")
-                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
-                .csrf(csrf -> csrf
-                        .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
-                        .csrfTokenRequestHandler(new CsrfTokenRequestAttributeHandler())
-                        .ignoringRequestMatchers("/login"))
-                .authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers(
-                                "/css/**",
-                                "/js/**",
-                                "/images/**",
-                                "/webjars/**",
-                                "/favicon.ico",
-                                "/error",
-                                "/invalid-application",
-                                "/h2-console/**",
-                                "/login",
-                                "/oauth2/login",
-                                "/logout"
-                        ).permitAll()
-                        .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-                        .requestMatchers("/api/**").authenticated()
-                        .requestMatchers("/user/**").authenticated()
-                        .anyRequest().authenticated())
-                .formLogin(form -> form
-                        .loginPage("/login")
-                        .loginProcessingUrl("/login")
-                        .authenticationDetailsSource(applicationAuthenticationDetailsSource)
-                        .successHandler(new SavedRequestAwareAuthenticationSuccessHandler())
-                        .failureUrl("/login?error")
-                        .permitAll())
-                .logout(logout -> logout
-                        .logoutSuccessUrl("/login?logout=true")
-                        .permitAll())
-                .sessionManagement(session -> session
-                        .sessionFixation().migrateSession()
-                        .invalidSessionUrl("/login"))
-                .headers(headers -> headers
-                        .frameOptions(frame -> frame.disable()));
+                var source = new UrlBasedCorsConfigurationSource();
+                source.registerCorsConfiguration("/**", configuration);
+                return source;
+        }
 
-        log.debug("[SecurityConfig] Default security configured - ClientIdExtractorFilter added");
-        return http.build();
-    }
+        @Bean
+        @Order(1)
+        public SecurityFilterChain authorizationServerSecurityFilterChain(HttpSecurity http) throws Exception {
+                OAuth2AuthorizationServerConfiguration.applyDefaultSecurity(http);
+                http.getConfigurer(OAuth2AuthorizationServerConfigurer.class)
+                                .oidc(Customizer.withDefaults());
+
+                http.exceptionHandling(exceptions -> exceptions
+                                .authenticationEntryPoint(new LoginUrlAuthenticationEntryPoint("/login")));
+
+                log.debug("[SecurityConfig] OAuth2 Authorization Server configured");
+                return http.build();
+        }
+
+        @Bean
+        @Order(2)
+        public SecurityFilterChain defaultSecurityFilterChain(HttpSecurity http) throws Exception {
+                http
+                                .addFilterBefore(clientIdExtractorFilter,
+                                                org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter.class)
+                                .securityMatcher(
+                                                "/",
+                                                "/login",
+                                                "/oauth2/login",
+                                                "/logout",
+                                                "/css/**",
+                                                "/js/**",
+                                                "/images/**",
+                                                "/webjars/**",
+                                                "/favicon.ico",
+                                                "/error",
+                                                "/invalid-application",
+                                                "/h2-console/**",
+                                                "/api/**",
+                                                "/user/**")
+                                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+                                .csrf(csrf -> csrf
+                                                .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
+                                                .csrfTokenRequestHandler(new CsrfTokenRequestAttributeHandler())
+                                                .ignoringRequestMatchers("/login"))
+                                .authorizeHttpRequests(authorize -> authorize
+                                                .requestMatchers(
+                                                                "/css/**",
+                                                                "/js/**",
+                                                                "/images/**",
+                                                                "/webjars/**",
+                                                                "/favicon.ico",
+                                                                "/error",
+                                                                "/invalid-application",
+                                                                "/h2-console/**",
+                                                                "/login",
+                                                                "/oauth2/login",
+                                                                "/logout")
+                                                .permitAll()
+                                                .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+                                                .requestMatchers("/api/**").authenticated()
+                                                .requestMatchers("/user/**").authenticated()
+                                                .anyRequest().authenticated())
+                                .formLogin(form -> form
+                                                .loginPage("/login")
+                                                .loginProcessingUrl("/login")
+                                                .authenticationDetailsSource(applicationAuthenticationDetailsSource)
+                                                .successHandler(new SavedRequestAwareAuthenticationSuccessHandler())
+                                                .failureUrl("/login?error")
+                                                .permitAll())
+                                .logout(logout -> logout
+                                                .logoutSuccessUrl("/login?logout=true")
+                                                .permitAll())
+                                .sessionManagement(session -> session
+                                                .sessionFixation().migrateSession()
+                                                .invalidSessionUrl("/login"))
+                                .headers(headers -> headers
+                                                .frameOptions(frame -> frame.disable()));
+
+                log.debug("[SecurityConfig] Default security configured - ClientIdExtractorFilter added");
+                return http.build();
+        }
 }

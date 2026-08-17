@@ -6,7 +6,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import java.util.List;
+import java.util.stream.Collectors;
 
 import com.oauth.application.in.ApplicationUseCase;
 import com.oauth.application.in.GetUserUseCase;
@@ -74,6 +74,7 @@ public class CustomUserDetailsService implements UserDetailsService {
                                 userDomain.accountNonExpired(),
                                 userDomain.credentialsNonExpired(),
                                 userDomain.accountNonLocked(),
-                                List.of(new SimpleGrantedAuthority(userDomain.role())));
+                                userDomain.roles().stream().map(SimpleGrantedAuthority::new)
+                                                .collect(Collectors.toList()));
         }
 }

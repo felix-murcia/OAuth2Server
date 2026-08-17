@@ -1,7 +1,5 @@
 package com.oauth.application.service;
 
-import org.springframework.stereotype.Service;
-
 import com.oauth.application.in.CreateUserUseCase;
 import com.oauth.application.out.persistence.CreateUserRepositoryPort;
 import com.oauth.domain.UserDomain;

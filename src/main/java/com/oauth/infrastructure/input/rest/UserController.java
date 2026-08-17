@@ -37,8 +37,8 @@ public class UserController {
     }
 
     @GetMapping("/me")
-    public GetUserDto me(@AuthenticationPrincipal GetUserDto authenticatedUser) {
-        var result = getUserUseCase.findById(authenticatedUser.id());
+    public GetUserDto me(@AuthenticationPrincipal org.springframework.security.core.userdetails.UserDetails authenticatedUser) {
+        var result = getUserUseCase.findByUsername(authenticatedUser.getUsername());
         return userDtoMapper.toGetUserDto(result.orElseThrow());
     }
 }

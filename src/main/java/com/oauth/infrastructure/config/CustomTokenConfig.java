@@ -26,9 +26,17 @@ public class CustomTokenConfig {
     public OAuth2TokenCustomizer<JwtEncodingContext> jwtTokenCustomizer() {
         return context -> {
 
-            // Solo procesar access tokens
-            if (!"access_token".equals(context.getTokenType().getValue())) {
-                log.debug("No es access_token, saliendo");
+            log.info("==== TOKEN CUSTOMIZER LOGGING ====");
+            log.info("Token Type: {}", context.getTokenType().getValue());
+            log.info("Principal Class: {}", context.getPrincipal().getClass().getName());
+            log.info("Principal Name: {}", context.getPrincipal().getName());
+            log.info("Authorities in Principal: {}", context.getPrincipal().getAuthorities());
+            log.info("====================================");
+
+            // Procesar id_token y access_token
+            if (!"access_token".equals(context.getTokenType().getValue()) && 
+                !"id_token".equals(context.getTokenType().getValue())) {
+                log.debug("Ignorando token type: {}", context.getTokenType().getValue());
                 return;
             }
 
