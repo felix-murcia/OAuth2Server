@@ -18,8 +18,8 @@ class CreateUserUseCaseSpec extends Specification {
 
     def 'execute creates user and returns UserDomain'() {
         given:
-        UserDomain user = new UserDomain(null, "testuser", "Password123", "test@example.com", "Test User", "ROLE_USER", true, true, true, true, Instant.now().toString(), Instant.now().toString())
-        UserDomain savedUser = new UserDomain(1L, "testuser", "Password123", "test@example.com", "Test User", "ROLE_USER", true, true, true, true, Instant.now().toString(), Instant.now().toString())
+        UserDomain user = new UserDomain(null, "testuser", "Password123", "test@example.com", "Test User", Set.of("ROLE_USER"), true, true, true, true, Instant.now().toString(), Instant.now().toString())
+        UserDomain savedUser = new UserDomain(1L, "testuser", "Password123", "test@example.com", "Test User", Set.of("ROLE_USER"), true, true, true, true, Instant.now().toString(), Instant.now().toString())
 
         when:
         def result = createUserService.execute(user)
@@ -32,7 +32,7 @@ class CreateUserUseCaseSpec extends Specification {
 
     def 'execute propagates exceptions from repository'() {
         given:
-        UserDomain user = new UserDomain(null, "existinguser", "Password123", "test@example.com", "Test User", "ROLE_USER", true, true, true, true, Instant.now().toString(), Instant.now().toString())
+        UserDomain user = new UserDomain(null, "existinguser", "Password123", "test@example.com", "Test User", Set.of("ROLE_USER"), true, true, true, true, Instant.now().toString(), Instant.now().toString())
 
         when:
         createUserService.execute(user)

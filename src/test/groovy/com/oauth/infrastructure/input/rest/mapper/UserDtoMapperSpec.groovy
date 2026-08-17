@@ -10,7 +10,7 @@ class UserDtoMapperSpec extends Specification {
 
     def 'toGetUserDto maps UserDomain to GetUserDto'() {
         given:
-        UserDomain user = new UserDomain(1L, "testuser", "hashedPassword", "test@example.com", "Test User", "ROLE_USER", true, true, true, true, Instant.now().toString(), Instant.now().toString())
+        UserDomain user = new UserDomain(1L, "testuser", "hashedPassword", "test@example.com", "Test User", Set.of("ROLE_USER"), true, true, true, true, Instant.now().toString(), Instant.now().toString())
 
         UserDtoMapper mapper = new UserDtoMapper()
 
@@ -45,7 +45,7 @@ class UserDtoMapperSpec extends Specification {
         user.password() == 'password'
         user.email() == 'admin@example.com'
         user.fullName() == 'Admin User'
-        user.role() == 'ROLE_USER'
+        user.roles().contains('ROLE_USER')
     }
 
 }

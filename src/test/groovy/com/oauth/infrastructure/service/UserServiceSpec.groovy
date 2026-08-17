@@ -19,7 +19,7 @@ class UserServiceSpec extends Specification {
     def "findByUsername returns user when user exists"() {
         given:
         String username = "admin"
-        UserDomain user = new UserDomain(1L, username, "hashedPassword", "admin@oauth.net", "Admin User", "ROLE_ADMIN", true, true, true, true, Instant.now().toString(), Instant.now().toString())
+        UserDomain user = new UserDomain(1L, username, "hashedPassword", "admin@oauth.net", "Admin User", Set.of("ROLE_ADMIN"), true, true, true, true, Instant.now().toString(), Instant.now().toString())
 
         when:
         Optional<UserDomain> result = userEntityService.findByUsername(username)
@@ -45,7 +45,7 @@ class UserServiceSpec extends Specification {
     def "findByEmail returns user when email exists"() {
         given:
         String email = "admin@oauth.net"
-        UserDomain user = new UserDomain(1L, "admin", "hashedPassword", email, "Admin User", "ROLE_ADMIN", true, true, true, true, Instant.now().toString(), Instant.now().toString())
+        UserDomain user = new UserDomain(1L, "admin", "hashedPassword", email, "Admin User", Set.of("ROLE_ADMIN"), true, true, true, true, Instant.now().toString(), Instant.now().toString())
 
         when:
         Optional<UserDomain> result = userEntityService.findByEmail(email)

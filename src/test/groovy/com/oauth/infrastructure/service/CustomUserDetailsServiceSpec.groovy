@@ -32,7 +32,7 @@ class CustomUserDetailsServiceSpec extends Specification {
     def "loadUserByUsername returns user when user exists"() {
         given:
         String username = "admin"
-        UserDomain user = new UserDomain(1L, username, "hashedPassword", "admin@oauth.net", "Admin User", "ROLE_ADMIN", true, true, true, true, Instant.now().toString(), Instant.now().toString())
+        UserDomain user = new UserDomain(1L, username, "hashedPassword", "admin@oauth.net", "Admin User", Set.of("ROLE_ADMIN"), true, true, true, true, Instant.now().toString(), Instant.now().toString())
 
         when:
         def result = customUserDetailsService.loadUserByUsername(username)
@@ -58,7 +58,7 @@ class CustomUserDetailsServiceSpec extends Specification {
         given:
         String username = "admin"
         String appClientId = "cine-platform"
-        UserDomain user = new UserDomain(1L, username, "hashedPassword", "admin@oauth.net", "Admin User", "ROLE_ADMIN", true, true, true, true, Instant.now().toString(), Instant.now().toString())
+        UserDomain user = new UserDomain(1L, username, "hashedPassword", "admin@oauth.net", "Admin User", Set.of("ROLE_ADMIN"), true, true, true, true, Instant.now().toString(), Instant.now().toString())
         
         ApplicationDomain app = new ApplicationDomain(1L, appClientId, "secret", "Cine Platform", "Desc", "url", "client_credentials", "read", "3600", "7200", true, Instant.now().toString(), Instant.now().toString())
 
@@ -76,7 +76,7 @@ class CustomUserDetailsServiceSpec extends Specification {
         given:
         String username = "admin"
         String appClientId = "cine-platform"
-        UserDomain user = new UserDomain(1L, username, "hashedPassword", "admin@oauth.net", "Admin User", "ROLE_ADMIN", true, true, true, true, Instant.now().toString(), Instant.now().toString())
+        UserDomain user = new UserDomain(1L, username, "hashedPassword", "admin@oauth.net", "Admin User", Set.of("ROLE_ADMIN"), true, true, true, true, Instant.now().toString(), Instant.now().toString())
         
         ApplicationDomain app = new ApplicationDomain(1L, appClientId, "secret", "Cine Platform", "Desc", "url", "client_credentials", "read", "3600", "7200", true, Instant.now().toString(), Instant.now().toString())
 
@@ -107,7 +107,7 @@ class CustomUserDetailsServiceSpec extends Specification {
         given:
         String username = "admin"
         String appClientId = "cine-platform"
-        UserDomain user = new UserDomain(1L, username, "hashedPassword", "admin@oauth.net", "Admin User", "ROLE_ADMIN", true, true, true, true, Instant.now().toString(), Instant.now().toString())
+        UserDomain user = new UserDomain(1L, username, "hashedPassword", "admin@oauth.net", "Admin User", Set.of("ROLE_ADMIN"), true, true, true, true, Instant.now().toString(), Instant.now().toString())
         
         ApplicationDomain app = new ApplicationDomain(1L, appClientId, "secret", "Cine Platform", "Desc", "url", "client_credentials", "read", "3600", "7200", true, Instant.now().toString(), Instant.now().toString())
 
@@ -125,7 +125,7 @@ class CustomUserDetailsServiceSpec extends Specification {
         given:
         String username = "admin"
         String appClientId = "cine-platform"
-        UserDomain user = new UserDomain(1L, username, "hashedPassword", "admin@oauth.net", "Admin User", "ROLE_ADMIN", true, true, true, true, Instant.now().toString(), Instant.now().toString())
+        UserDomain user = new UserDomain(1L, username, "hashedPassword", "admin@oauth.net", "Admin User", Set.of("ROLE_ADMIN"), true, true, true, true, Instant.now().toString(), Instant.now().toString())
         
         ApplicationDomain app = new ApplicationDomain(1L, appClientId, "secret", "Cine Platform", "Desc", "url", "client_credentials", "read", "3600", "7200", true, Instant.now().toString(), Instant.now().toString())
 

@@ -32,7 +32,7 @@ class UserControllerSpec extends Specification {
         dto.setFullName('New User')
         dto.setEmail('newuser@example.com')
 
-        UserDomain user = new UserDomain(1L, 'newuser', 'hashedPassword', 'newuser@example.com', 'New User', 'ROLE_USER', true, true, true, true, Instant.now().toString(), Instant.now().toString())
+        UserDomain user = new UserDomain(1L, 'newuser', 'hashedPassword', 'newuser@example.com', 'New User', Set.of('ROLE_USER'), true, true, true, true, Instant.now().toString(), Instant.now().toString())
 
         when:
         GetUserDto result = userController.nuevoUsuario(dto)
@@ -47,15 +47,16 @@ class UserControllerSpec extends Specification {
 
     def 'me returns GetUserDto from authenticated user dto'() {
         given:
-        GetUserDto authenticatedUser = new GetUserDto(1L, 'admin', 'Admin User', 'admin@example.com', Set.of('ROLE_ADMIN'))
+        org.springframework.security.core.userdetails.UserDetails authenticatedUser = Mock(org.springframework.security.core.userdetails.UserDetails)
+        authenticatedUser.getUsername() >> 'admin'
         
-        UserDomain user = new UserDomain(1L, 'admin', 'hashedPassword', 'admin@example.com', 'Admin User', 'ROLE_ADMIN', true, true, true, true, Instant.now().toString(), Instant.now().toString())
+        UserDomain user = new UserDomain(1L, 'admin', 'hashedPassword', 'admin@example.com', 'Admin User', Set.of('ROLE_ADMIN'), true, true, true, true, Instant.now().toString(), Instant.now().toString())
 
         when:
         GetUserDto result = userController.me(authenticatedUser)
 
         then:
-        1 * getUserUseCase.findById(1L) >> Optional.of(user)
+        1 * getUserUseCase.findByUsername('admin') >> Optional.of(user)
         result != null
         result.username() == 'admin'
         result.id() == 1L
@@ -64,13 +65,14 @@ class UserControllerSpec extends Specification {
 
     def 'me throws exception when user does not exist'() {
         given:
-        GetUserDto authenticatedUser = new GetUserDto(1L, 'nobody', 'Nobody User', 'nobody@example.com', Set.of('ROLE_USER'))
+        org.springframework.security.core.userdetails.UserDetails authenticatedUser = Mock(org.springframework.security.core.userdetails.UserDetails)
+        authenticatedUser.getUsername() >> 'nobody'
         
         when:
         userController.me(authenticatedUser)
 
         then:
-        1 * getUserUseCase.findById(1L) >> Optional.empty()
+        1 * getUserUseCase.findByUsername('nobody') >> Optional.empty()
         thrown(NoSuchElementException)
     }
 }
